@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Tracing;
-
-namespace CodeRunner
+﻿namespace CodeRunner
 {
     public partial class MainPage : ContentPage
     {
@@ -11,12 +9,10 @@ namespace CodeRunner
 
         private void OpenGame(object sender, EventArgs e)
         {
-
         }
 
         private void OpenSettings(object sender, EventArgs e)
         {
-
         }
 
     }
