@@ -7,12 +7,14 @@
             InitializeComponent();
         }
 
-        private void OpenGame(object sender, EventArgs e)
+        private async void OpenGame(object sender, EventArgs e)
         {
+            await Shell.Current.GoToAsync($"//{nameof(GamePage)}");
         }
 
-        private void OpenSettings(object sender, EventArgs e)
+        private async void OpenSettings(object sender, EventArgs e)
         {
+            await Shell.Current.GoToAsync($"//{nameof(SettingsPage)}");
         }
 
     }
