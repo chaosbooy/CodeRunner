@@ -72,8 +72,4 @@
 	  </MauiXaml>
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Resources\Scripts\" />
-	</ItemGroup>
-
 </Project>

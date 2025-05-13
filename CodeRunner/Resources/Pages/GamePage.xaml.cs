@@ -1,15 +1,28 @@
+using CodeRunner.Resources.Scripts;
+
 namespace CodeRunner;
 
 public partial class GamePage : ContentPage
 {
-	private bool _paused = false;
-	private int _level = 0;
-	private int _boardHeight = 10;
-	private int _boardWidth = 20;
+	private bool _paused;
+	private int _level;
+	private MapHolder _mapHolder;
+
+	public readonly Dictionary<int, Color> MapColors = new Dictionary<int, Color>
+	{
+		{0, Colors.Azure },
+		{1, Colors.Green },
+		{2, Colors.Red },
+		{3, Colors.Black },
+	};
 
 	public GamePage()
 	{
 		InitializeComponent();
+
+		_paused = false;
+		_level = 0;
+		_mapHolder = new MapHolder();
 	}
 
 	private void ClickedGeneration(object sender, EventArgs e)
@@ -21,44 +34,37 @@ public partial class GamePage : ContentPage
 
 	private void GenerateMap()
 	{
-		boardGrid.Children.Clear();
-		boardGrid.RowDefinitions.Clear();
-		boardGrid.ColumnDefinitions.Clear();
+		if (_paused) return;
 
-		//Generating board size
-		for (int i = 0; i < _boardHeight; i++)
+		_mapHolder.GenerateMap(20, 10);
+
+        boardGrid.Children.Clear();
+        boardGrid.RowDefinitions.Clear();
+        boardGrid.ColumnDefinitions.Clear();
+
+        for (int i = 0; i < _mapHolder.Map.GetLength(1); i++)
+        {
+            boardGrid.RowDefinitions.Add(new RowDefinition());
+            boardGrid.ColumnDefinitions.Add(new ColumnDefinition());
+            boardGrid.ColumnDefinitions.Add(new ColumnDefinition());
+        }
+
+        for (int i = 0; i < _mapHolder.Map.GetLength(0); i++) 
 		{
-			boardGrid.RowDefinitions.Add(new RowDefinition());
-			boardGrid.ColumnDefinitions.Add(new ColumnDefinition());
-			boardGrid.ColumnDefinitions.Add(new ColumnDefinition());
-		}
-
-		Random rand = new Random();
-
-		int entry, exit;
-		entry = rand.Next(_boardHeight);
-		exit = rand.Next(_boardHeight);
-
-		for (int i = 0; i < _boardWidth; i++)
-		{
-			for(int j = 0; j < _boardHeight; j++)
+			for(int j = 0; j < _mapHolder.Map.GetLength(1); j++)
 			{
-
 				var temp = new Border
 				{
-					BackgroundColor = Colors.AliceBlue,
+					BackgroundColor = MapColors[_mapHolder.Map[i,j]]
 				};
 
-				if (i == 0 && j == entry) temp.BackgroundColor = Colors.Green;
-				else if(i == _boardWidth - 1 && j == exit) temp.BackgroundColor = Colors.Red;
+                Grid.SetRow(temp, j);
+                Grid.SetColumn(temp, i);
 
-				Grid.SetRow(temp, j);
-				Grid.SetColumn(temp, i);
-
-				boardGrid.Children.Add(temp);
-			}
+                boardGrid.Children.Add(temp);
+            }
 		}
-
+		
 	}
 
     #endregion
