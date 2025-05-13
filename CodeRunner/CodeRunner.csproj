@@ -72,4 +72,8 @@
 	  </MauiXaml>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Resources\Sprites\" />
+	</ItemGroup>
+
 </Project>

@@ -1,12 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CodeRunner.Resources.Scripts
+﻿namespace CodeRunner.Resources.Scripts
 {
-    internal class Enemy
+    public class Enemy : ICloneable
     {
+        public string Name { get; set; }
+        public string Description { get; set; }
+
+        private Point _location;
+        public int Difficulty { get; set; }
+
+        public string SpySpritePath{ get; set; }
+        public event EventHandler SpyMovementScript;
+
+        //if the enemy doesnt use the base the blind version will be the same
+        public string BlindSpritePath { get; set; }
+        public event EventHandler BlindBaseMovementScript;
+
+
+        public Enemy()
+        {
+
+        }
+
+        public void Kaboooomm()
+        {
+
+        }
+
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
     }
 }
