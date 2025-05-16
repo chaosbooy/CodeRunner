@@ -3,10 +3,40 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="CodeRunner.SettingsPage"
              Title="SettingsPage">
-    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
-        <Label 
-            Text="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+
+    <ScrollView>
+        <VerticalStackLayout HorizontalOptions="Fill" VerticalOptions="Center">
+            <Label 
+                Text="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa!"
+                VerticalOptions="Center" 
+                HorizontalOptions="Center" />
+
+            <Grid HorizontalOptions="Fill">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Label HorizontalOptions="Center" Text="SSMSMS" />
+                <Switch HorizontalOptions="Center" Grid.Column="1" />
+            </Grid>
+
+            <Grid HorizontalOptions="Fill" >
+                
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                
+                <Button HorizontalOptions="Center" Text="Save" Background="ForestGreen" Clicked="SaveSettings"/>
+
+                <Button HorizontalOptions="Center" Grid.Column="1" Text="Return" Background="Purple" Clicked="ReturnToPreviousPage" />
+
+            </Grid>
+
+
+        </VerticalStackLayout>
+    </ScrollView>
+    
 </ContentPage>

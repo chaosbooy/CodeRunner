@@ -4,7 +4,20 @@
              x:Class="CodeRunner.GamePage"
              Title="GamePage">
     <Grid>
+        
         <Grid x:Name="boardGrid" Margin="30">
+        </Grid>
+
+        <Grid x:Name="JoystickGrid">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Opacity="0.5" BackgroundColor="Blue" />
+
+            <Border Grid.Column="1" Opacity="0.5" Background="Pink" />
+
         </Grid>
 
         <Button Text="G" Clicked="ClickedGeneration" HeightRequest="50" WidthRequest="50" Background="BlanchedAlmond" />
@@ -17,5 +30,7 @@
             <Button Text="Settings" Clicked="OpenSettings" />
             <Button Text="Exit" Clicked="OpenLobby" />
         </VerticalStackLayout>
+
+        
     </Grid>
 </ContentPage>

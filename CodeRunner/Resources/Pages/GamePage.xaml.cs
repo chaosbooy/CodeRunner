@@ -91,7 +91,15 @@ public partial class GamePage : ContentPage
 
     private async void OpenSettings(object sender, EventArgs e)
 	{
-        await Shell.Current.GoToAsync($"//{nameof(SettingsPage)}");
+		SettingsPage.PreviousPage = nameof(GamePage);
+		try
+		{
+            await Shell.Current.GoToAsync($"//{nameof(SettingsPage)}");
+        }
+		catch
+		{
+			throw new Exception($"There is no page named \"{SettingsPage.PreviousPage}\".");
+		}
     }
 
 	private async void OpenLobby(object sender, EventArgs e)

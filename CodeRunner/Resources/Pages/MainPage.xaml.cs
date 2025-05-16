@@ -14,6 +14,7 @@
 
         private async void OpenSettings(object sender, EventArgs e)
         {
+            SettingsPage.PreviousPage = nameof(MainPage);
             await Shell.Current.GoToAsync($"//{nameof(SettingsPage)}");
         }
 
