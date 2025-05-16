@@ -59,21 +59,29 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <AndroidResource Remove="Resources\Sprites\**" />
+	  <Compile Remove="Resources\Sprites\**" />
+	  <EmbeddedResource Remove="Resources\Sprites\**" />
+	  <MauiCss Remove="Resources\Sprites\**" />
+	  <MauiXaml Remove="Resources\Sprites\**" />
+	  <None Remove="Resources\Sprites\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Resources\Controls\Joystick.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Resources\Pages\GamePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Resources\Pages\SettingsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Resources\Sprites\" />
 	</ItemGroup>
 
 </Project>

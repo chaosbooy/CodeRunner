@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:CodeRunner.Resources.Controls"
              x:Class="CodeRunner.GamePage"
              Title="GamePage">
     <Grid>
@@ -14,9 +15,13 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Border Opacity="0.5" BackgroundColor="Blue" />
+            <Border BackgroundColor="#7F0000FF" >
+                <controls:Joystick />
+            </Border>
 
-            <Border Grid.Column="1" Opacity="0.5" Background="Pink" />
+            <Border Grid.Column="1" Background="#7FFFC0CB" >
+                <controls:Joystick />
+            </Border>
 
         </Grid>
 
