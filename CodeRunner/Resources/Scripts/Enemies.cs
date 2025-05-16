@@ -14,7 +14,7 @@ namespace CodeRunner.Resources.Scripts
         {
             Name = "dummy",
             Description = "most basic enemy moves randomly",
-            Difficulty = 0,
+            Difficulty = 1,
 
         };
 
@@ -22,7 +22,7 @@ namespace CodeRunner.Resources.Scripts
         {
             Name = "base",
             Description = "turns other enemies into their spy version",
-            Difficulty = 1,
+            Difficulty = 2,
         };
 
         public readonly static Enemy Eye = new Enemy

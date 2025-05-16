@@ -3,7 +3,20 @@
     public class MapHolder
     {
         private int[,] _map;
+        private int _entrance;
+        private int _exit;
 
+        public readonly Dictionary<int, Color> MapColors = new Dictionary<int, Color>
+        {
+            {0, Colors.Azure },
+            {1, Colors.Green },
+            {2, Colors.Red },
+            {3, Colors.Black },
+        };
+
+
+        public int Entrance { get { return _entrance; } }
+        public int Exit { get { return _exit; } }
         public int[,] Map { get { return _map; } }
 
         public MapHolder ()

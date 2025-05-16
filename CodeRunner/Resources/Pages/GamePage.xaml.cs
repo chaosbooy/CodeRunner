@@ -6,15 +6,7 @@ public partial class GamePage : ContentPage
 {
 	private bool _paused;
 	private int _level;
-	private MapHolder _mapHolder;
-
-	public readonly Dictionary<int, Color> MapColors = new Dictionary<int, Color>
-	{
-		{0, Colors.Azure },
-		{1, Colors.Green },
-		{2, Colors.Red },
-		{3, Colors.Black },
-	};
+	private MapHolder _map;
 
 	public GamePage()
 	{
@@ -22,7 +14,7 @@ public partial class GamePage : ContentPage
 
 		_paused = false;
 		_level = 0;
-		_mapHolder = new MapHolder();
+		_map = new MapHolder();
 	}
 
 	private void ClickedGeneration(object sender, EventArgs e)
@@ -30,32 +22,39 @@ public partial class GamePage : ContentPage
 		GenerateMap();
 	}
 
-	#region TerrainGeneration
+	#region Level Generation
+
+	private void GenerateEnemies()
+	{
+        // y =log(x+1) * 4 <- enemy number spawning
+		// maybe change that with enemy points to give out and then based on difficulty it will spend the points UP to the number of max enemies spawned
+
+    }
 
 	private void GenerateMap()
 	{
 		if (_paused) return;
 
-		_mapHolder.GenerateMap(20, 10);
+		_map.GenerateMap(20, 10);
 
         boardGrid.Children.Clear();
         boardGrid.RowDefinitions.Clear();
         boardGrid.ColumnDefinitions.Clear();
 
-        for (int i = 0; i < _mapHolder.Map.GetLength(1); i++)
+        for (int i = 0; i < _map.Map.GetLength(1); i++)
         {
             boardGrid.RowDefinitions.Add(new RowDefinition());
             boardGrid.ColumnDefinitions.Add(new ColumnDefinition());
             boardGrid.ColumnDefinitions.Add(new ColumnDefinition());
         }
 
-        for (int i = 0; i < _mapHolder.Map.GetLength(0); i++) 
+        for (int i = 0; i < _map.Map.GetLength(0); i++) 
 		{
-			for(int j = 0; j < _mapHolder.Map.GetLength(1); j++)
+			for(int j = 0; j < _map.Map.GetLength(1); j++)
 			{
 				var temp = new Border
 				{
-					BackgroundColor = MapColors[_mapHolder.Map[i,j]]
+					BackgroundColor = _map.MapColors[_map.Map[i,j]]
 				};
 
                 Grid.SetRow(temp, j);
@@ -69,7 +68,26 @@ public partial class GamePage : ContentPage
 
     #endregion
 
-    #region Navigation
+    #region Player Controls
+	
+	private void MovementJoystick()
+	{
+
+	}
+
+	private void AttackJoystick()
+	{
+
+	}
+
+	private void PlayerShoot()
+	{
+
+	}
+
+    #endregion
+
+    #region Page Navigation
 
     private async void OpenSettings(object sender, EventArgs e)
 	{
