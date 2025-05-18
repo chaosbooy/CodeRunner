@@ -3,36 +3,42 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="CodeRunner.MainPage">
 
-    <ScrollView>
+    <Grid>
+
+        <Image
+            Source="dummy.gif"
+            Aspect="Fill"
+            SemanticProperties.Description="game main image" 
+            IsAnimationPlaying="True" 
+            Margin="10"/>
+
         <VerticalStackLayout
             Margin="0,100,0,0"
             Padding="30,0"
             Spacing="25">
 
             <Label
-                Text="Hellon't, World!"
-                Style="{StaticResource Headline}"
-                SemanticProperties.HeadingLevel="Level1" />
-
-            <Image
-                Source="dotnet_bot.png"
-                HeightRequest="185"
-                Aspect="AspectFit"
-                SemanticProperties.Description="game main image" />
+            Text="Hellon't, World!"
+            Style="{StaticResource Headline}"
+            SemanticProperties.HeadingLevel="Level1"
+            FontAttributes="Bold"
+            FontSize="Large"/>
 
             <Button
-                x:Name="StartBtn"
-                Text="Click me" 
-                SemanticProperties.Description="button that starts the game"
-                Clicked="OpenGame"
-                HorizontalOptions="Fill" />
+            x:Name="StartBtn"
+            Text="Click me" 
+            SemanticProperties.Description="button that starts the game"
+            Clicked="OpenGame"
+            HorizontalOptions="Fill" />
+            
             <Button
-                x:Name="Settings"
-                Text="Setting me"
-                Clicked="OpenSettings"
-                SemanticProperties.Description="button to open the settings page"
-            />
+            x:Name="Settings"
+            Text="Setting me"
+            Clicked="OpenSettings"
+            SemanticProperties.Description="button to open the settings page" />
+            
         </VerticalStackLayout>
-    </ScrollView>
+    </Grid>
+    
 
 </ContentPage>

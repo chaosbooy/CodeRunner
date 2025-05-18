@@ -7,6 +7,7 @@ public partial class GamePage : ContentPage
 	private bool _paused;
 	private int _level;
 	private MapHolder _map;
+	private PointF _attackPosition;
 
 	public GamePage()
 	{
@@ -69,21 +70,19 @@ public partial class GamePage : ContentPage
     #endregion
 
     #region Player Controls
-	
-	private void MovementJoystick()
-	{
 
-	}
+    private void MovementDirectionChanged(object sender, PointF e)
+    {
+        Player.TranslationX += e.X;
+        Player.TranslationY += e.Y;
+    }
 
-	private void AttackJoystick()
-	{
+    private void Attack(object sender, PanUpdatedEventArgs e)
+    {
 
-	}
+    }
 
-	private void PlayerShoot()
-	{
-
-	}
+    private void AttackDirectionChanged(object sender, PointF e) => _attackPosition = e;
 
     #endregion
 
@@ -122,4 +121,5 @@ public partial class GamePage : ContentPage
     }
 
     #endregion
+
 }

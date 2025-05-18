@@ -1,11 +1,30 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="CodeRunner.Resources.Controls.Joystick">
+             x:Class="CodeRunner.Resources.Controls.Joystick"
+             IsVisible="{Binding DefaultVisibility}">
+    <Grid x:Name="JoystickGrid">
 
+        <Grid.GestureRecognizers>
+            <PanGestureRecognizer PanUpdated="OnPanUpdated" />
+        </Grid.GestureRecognizers>
 
-    <Grid>
-        <Ellipse Background="Red" Opacity="0.5" WidthRequest="60" HeightRequest="60" HorizontalOptions="Center" VerticalOptions="Center" />
-        <Ellipse Background="Red" WidthRequest="30" HeightRequest="30" HorizontalOptions="Center" VerticalOptions="Center" />
+        <!-- Background Circle -->
+        <Ellipse x:Name="BigCircle"
+                 BackgroundColor="{Binding JoystickBackground}"
+                 WidthRequest="{Binding BigRadius}"
+                 HeightRequest="{Binding BigRadius}"
+                 Opacity="0.1"
+                 TranslationX="{Binding BigCircleTranslationX}"
+                 TranslationY="{Binding BigCircleTranslationY}" />
+
+        <!-- Thumb Circle -->
+        <Ellipse x:Name="SmallCircle"
+                 Opacity="0.5"
+                 BackgroundColor="{Binding JoystickBackground}"
+                 WidthRequest="{Binding SmallRadius}"
+                 HeightRequest="{Binding SmallRadius}"
+                 TranslationX="{Binding SmallCircleTranslationX}"
+                 TranslationY="{Binding SmallCircleTranslationY}" />
     </Grid>
 </ContentView>

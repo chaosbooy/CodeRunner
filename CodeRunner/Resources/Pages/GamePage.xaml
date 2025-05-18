@@ -15,15 +15,21 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Border BackgroundColor="#7F0000FF" >
-                <controls:Joystick />
+            <Border BackgroundColor="Transparent" >
+                <controls:Joystick JoystickBackground="Blue" NavigationChanged="MovementDirectionChanged"/>
             </Border>
 
-            <Border Grid.Column="1" Background="#7FFFC0CB" >
-                <controls:Joystick />
+            <Border Grid.Column="1" Background="Transparent" >
+                <controls:Joystick JoystickBackground="Pink" BigRadius="200" NavigationChanged="AttackDirectionChanged">
+                    <controls:Joystick.GestureRecognizers>
+                        <PanGestureRecognizer PanUpdated="Attack"/>
+                    </controls:Joystick.GestureRecognizers>
+                </controls:Joystick >
             </Border>
 
         </Grid>
+
+        <Ellipse x:Name="Player" WidthRequest="50" HeightRequest="50" BackgroundColor="DeepPink" />
 
         <Button Text="G" Clicked="ClickedGeneration" HeightRequest="50" WidthRequest="50" Background="BlanchedAlmond" />
 
