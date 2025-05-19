@@ -86,15 +86,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiImage Include="Resources\Images\Enemies\Base.gif" />
-	  <MauiImage Include="Resources\Images\Enemies\BlindEye.gif" />
-	  <MauiImage Include="Resources\Images\Enemies\BlindGhost.gif" />
-	  <MauiImage Include="Resources\Images\Enemies\BlindStar.gif" />
-	  <MauiImage Include="Resources\Images\Enemies\Camper.gif" />
+	  <MauiImage Include="Resources\Images\Enemies\base.gif" />
+	  <MauiImage Include="Resources\Images\Enemies\blindeye.gif" />
+	  <MauiImage Include="Resources\Images\Enemies\blindghost.gif" />
+	  <MauiImage Include="Resources\Images\Enemies\blindstar.gif" />
+	  <MauiImage Include="Resources\Images\Enemies\camper.gif" />
 	  <MauiImage Include="Resources\Images\Enemies\dummy.gif" />
-	  <MauiImage Include="Resources\Images\Enemies\SpyEye.gif" />
-	  <MauiImage Include="Resources\Images\Enemies\SpyGhost.gif" />
-	  <MauiImage Include="Resources\Images\Enemies\SpyStar.gif" />
+	  <MauiImage Include="Resources\Images\Enemies\spyeye.gif" />
+	  <MauiImage Include="Resources\Images\Enemies\spyghost.gif" />
+	  <MauiImage Include="Resources\Images\Enemies\spystar.gif" />
 	</ItemGroup>
 
 	<ItemGroup>
