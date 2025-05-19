@@ -29,9 +29,9 @@
 
         </Grid>
 
-        <Ellipse x:Name="Player" WidthRequest="50" HeightRequest="50" BackgroundColor="DeepPink" />
+        <Image Source="{Binding PlayerSprite}" x:Name="Player" WidthRequest="60" HeightRequest="60" TranslationX="{Binding PlayerTranslationX}" TranslationY="{Binding PlayerTranslationY}"/>
 
-        <Button Text="G" Clicked="ClickedGeneration" HeightRequest="50" WidthRequest="50" Background="BlanchedAlmond" />
+        <Button Text="G" Clicked="ClickedGeneration" HorizontalOptions="Start" HeightRequest="50" WidthRequest="50" Background="BlanchedAlmond" />
 
         <Button x:Name="pauseButton" Text="S" WidthRequest="30" HeightRequest="30" HorizontalOptions="End" VerticalOptions="Start" Margin="30"
                 Clicked="PauseResume"/>

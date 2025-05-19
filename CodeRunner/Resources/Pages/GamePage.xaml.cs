@@ -1,31 +1,91 @@
 using CodeRunner.Resources.Scripts;
+using Microsoft.Maui.Dispatching;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace CodeRunner;
 
-public partial class GamePage : ContentPage
+public partial class GamePage : ContentPage, INotifyPropertyChanged
 {
 	private bool _paused;
 	private int _level;
 	private MapHolder _map;
 	private PointF _attackPosition;
+    private PointF _movePosition;
+	private Player _player;
 
-	public GamePage()
-	{
-		InitializeComponent();
+    private List<Enemy> _allEnemies;
+    private bool _baseExists;
 
-		_paused = false;
-		_level = 0;
-		_map = new MapHolder();
-	}
 
-	private void ClickedGeneration(object sender, EventArgs e)
-	{
-		GenerateMap();
-	}
+    public GamePage()
+    {
+        _paused = false;
+        _level = 0;
+        _map = new MapHolder();
+        _player = new Player
+        {
+            SpritePath = "player.gif",
+            Speed = 3,
+            Location = new Point(0, 0),
+            Name = "Yo mama",
+            Rotation = 0,
+            Score = 0,
+        };
 
-	#region Level Generation
+        _allEnemies = new List<Enemy>();
 
-	private void GenerateEnemies()
+        InitializeComponent();
+        BindingContext = this;
+
+        StartLoopTimer();
+    }
+
+    private void ClickedGeneration(object sender, EventArgs e)
+    {
+        GenerateMap();
+    }
+
+    #region GameLoop
+
+    CancellationTokenSource _cts = new();
+
+    async Task StartLoopTimer()
+    {
+        while (!_cts.Token.IsCancellationRequested)
+        {
+            GameLoop();
+            await Task.Delay(20); // wait 0,02 second
+        }
+    }
+
+    // To stop it:
+    void StopLoopTimer()
+    {
+        _cts.Cancel();
+    }
+
+    private void GameLoop()
+    {
+        if (_paused) return;
+
+        foreach (var enemy in _allEnemies)
+        {
+            enemy.Move(_baseExists);
+        }
+
+        _player.Move(_movePosition);
+        OnPropertyChanged(nameof(PlayerTranslationX));
+        OnPropertyChanged(nameof(PlayerTranslationY));
+
+    }
+
+    #endregion
+
+    #region Level Generation
+
+    private void GenerateEnemies()
 	{
         // y =log(x+1) * 4 <- enemy number spawning
 		// maybe change that with enemy points to give out and then based on difficulty it will spend the points UP to the number of max enemies spawned
@@ -72,11 +132,7 @@ public partial class GamePage : ContentPage
 
     #region Player Controls
 
-    private void MovementDirectionChanged(object sender, PointF e)
-    {
-        Player.TranslationX += e.X;
-        Player.TranslationY += e.Y;
-    }
+    private void MovementDirectionChanged(object sender, PointF e) => _movePosition = e;
 
     private void Attack(object sender, PanUpdatedEventArgs e)
     {
@@ -123,4 +179,15 @@ public partial class GamePage : ContentPage
 
     #endregion
 
+    #region Bindings
+    public string PlayerSprite => _player.SpritePath;
+    public float PlayerTranslationX => _player.Location.X;
+    public float PlayerTranslationY => _player.Location.Y;
+
+
+    public event PropertyChangedEventHandler PropertyChanged;
+    protected void OnPropertyChanged([CallerMemberName] string name = null) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+    #endregion
 }

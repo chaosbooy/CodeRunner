@@ -12,14 +12,14 @@ namespace CodeRunner.Resources.Scripts
         public string Name { get; set; }
 
 
-        private float _speed;
-        public Point Location { get; set; }
+        public float Speed {get; set; }
+        public PointF Location { get; set; }
         public float Rotation { get; set; }
 
         public int Score { get; set; }
 
-        public string SpySpritePath { get; set; }
-        public event EventHandler SpyMovementScript;
+        public string SpritePath { get; set; }
+        public string AttackSpritePath { get; set; }
 
 
         public Player()
@@ -27,16 +27,16 @@ namespace CodeRunner.Resources.Scripts
 
         }
 
-        public void MovePlayer(Point direction)
+        public void Move(PointF direction)
+        {
+            Location = new PointF(Location.X + direction.X * Speed, Location.Y + direction.Y * Speed);
+        }
+
+        //changes sprite from 
+        public void Rotate(PointF direction)
         {
 
         }
-
-        public void RotatePlayer(Point direction)
-        {
-
-        }
-
 
         public void Kaboooomm()
         {
