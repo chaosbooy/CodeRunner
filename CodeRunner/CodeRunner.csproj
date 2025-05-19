@@ -68,7 +68,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\Images\Enemies\Base.gif" />
+	  <None Remove="Resources\Images\Enemies\BlindEye.gif" />
+	  <None Remove="Resources\Images\Enemies\BlindGhost.gif" />
+	  <None Remove="Resources\Images\Enemies\BlindStar.gif" />
+	  <None Remove="Resources\Images\Enemies\Camper.gif" />
 	  <None Remove="Resources\Images\Enemies\Dummy.gif" />
+	  <None Remove="Resources\Images\Enemies\SpyEye.gif" />
+	  <None Remove="Resources\Images\Enemies\SpyGhost.gif" />
+	  <None Remove="Resources\Images\Enemies\SpyStar.gif" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -78,7 +86,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiImage Include="Resources\Images\Enemies\Base.gif" />
+	  <MauiImage Include="Resources\Images\Enemies\BlindEye.gif" />
+	  <MauiImage Include="Resources\Images\Enemies\BlindGhost.gif" />
+	  <MauiImage Include="Resources\Images\Enemies\BlindStar.gif" />
+	  <MauiImage Include="Resources\Images\Enemies\Camper.gif" />
 	  <MauiImage Include="Resources\Images\Enemies\dummy.gif" />
+	  <MauiImage Include="Resources\Images\Enemies\SpyEye.gif" />
+	  <MauiImage Include="Resources\Images\Enemies\SpyGhost.gif" />
+	  <MauiImage Include="Resources\Images\Enemies\SpyStar.gif" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -36,7 +36,8 @@ public partial class GamePage : ContentPage
 	{
 		if (_paused) return;
 
-		_map.GenerateMap(20, 10);
+		Random rand = new Random();
+		_map.GenerateMap(20, 10, rand.Next());
 
         boardGrid.Children.Clear();
         boardGrid.RowDefinitions.Clear();
