@@ -16,6 +16,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 	private Player _player;
 
     private List<Enemy> _allEnemies;
+    private List<Projectile> _projectiles;
     private bool _baseExists;
 
 
@@ -23,21 +24,35 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
     {
         _paused = false;
         _level = 0;
-        _map = new MapHolder();
+        _map = MapHolder.Instance;
         _player = new Player
         {
             SpritePath = "player.gif",
-            Speed = 3,
+            Speed = 5,
             Location = new Point(0, 0),
             Name = "Yo mama",
             Rotation = 0,
             Score = 0,
+            ProjectileStyle = new Projectile
+            {
+                Location = new PointF(0, 0),
+                radius = 15,
+                Rotation = 0,
+                Speed = new PointF(0,0),
+                SpeedMultiplier = 15,
+                SpritePath = "bullet.png"
+            }
         };
 
+
+
         _allEnemies = new List<Enemy>();
+        _projectiles = new List<Projectile>();
 
         InitializeComponent();
         BindingContext = this;
+
+
 
         StartLoopTimer();
     }
@@ -49,30 +64,21 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 
     #region GameLoop
 
-    CancellationTokenSource _cts = new();
-
-    async Task StartLoopTimer()
-    {
-        while (!_cts.Token.IsCancellationRequested)
-        {
-            GameLoop();
-            await Task.Delay(20); // wait 0,02 second
-        }
-    }
-
-    // To stop it:
-    void StopLoopTimer()
-    {
-        _cts.Cancel();
-    }
-
     private void GameLoop()
     {
-        if (_paused) return;
 
-        foreach (var enemy in _allEnemies)
+        foreach (var enemy in _allEnemies.Select((value, index) => new { value, index }))
         {
-            enemy.Move(_baseExists);
+            enemy.value.Move(_baseExists);
+
+        }
+        
+        for (int i = 0; i < _projectiles.Count; i++)
+        {
+            _projectiles[i].Move();
+            var image = (Image)projectilesGrid[i];
+            image.TranslationX = _projectiles[i].Location.X;
+            image.TranslationY = _projectiles[i].Location.Y;
         }
 
         _player.Move(_movePosition);
@@ -81,9 +87,39 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 
     }
 
+    //idk its like a bool for the asynchronous loop to stop
+    CancellationTokenSource _cts = new();
+
+    //Invoke this to start the loop
+    async Task StartLoopTimer()
+    {
+        _cts = new();
+        while (!_cts.Token.IsCancellationRequested)
+        {
+            GameLoop();
+            await Task.Delay(20); // wait 0,02 second
+        }
+    }
+
+    //Invoke this to stop the loop
+    void StopLoopTimer()
+    {
+        _cts.Cancel();
+    }
+
+    
+
     #endregion
 
     #region Level Generation
+
+    private void GenerateLevel()
+    {
+        GenerateMap();
+        GenerateEnemies();
+
+        GeneratePickUps();
+    }
 
     private void GenerateEnemies()
 	{
@@ -116,7 +152,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 			{
 				var temp = new Border
 				{
-					BackgroundColor = _map.MapColors[_map.Map[i,j]]
+					BackgroundColor = MapHolder.MapColors[_map.Map[i,j]]
 				};
 
                 Grid.SetRow(temp, j);
@@ -128,6 +164,11 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 		
 	}
 
+    private void GeneratePickUps()
+    {
+
+    }
+
     #endregion
 
     #region Player Controls
@@ -136,10 +177,41 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 
     private void Attack(object sender, PanUpdatedEventArgs e)
     {
+        switch(e.StatusType)
+        {
+            case GestureStatus.Completed:
+            case GestureStatus.Canceled:
 
+                var playerProjectile = _player.ProjectileStyle;
+
+                playerProjectile.Speed = _attackPosition;
+                playerProjectile.Rotation = _player.Rotation;
+                playerProjectile.Location = _player.Location;
+
+                var projectileImage = new Image
+                {
+                    Margin = 50,
+                    Rotation = playerProjectile.Rotation,
+                    HorizontalOptions = LayoutOptions.Start,
+                    TranslationX = playerProjectile.Location.X + (playerProjectile.Speed.X * playerProjectile.SpeedMultiplier),
+                    TranslationY = playerProjectile.Location.Y + (playerProjectile.Speed.Y * playerProjectile.SpeedMultiplier),
+                    WidthRequest = playerProjectile.radius,
+                    HeightRequest = playerProjectile.radius,
+                    Source = playerProjectile.SpritePath
+                };
+
+                projectilesGrid.Add(projectileImage);
+                _projectiles.Add(playerProjectile);
+
+                break;
+        }
     }
 
-    private void AttackDirectionChanged(object sender, PointF e) => _attackPosition = e;
+    private void AttackDirectionChanged(object sender, PointF e)
+    {
+        if (e.IsEmpty) return;
+        _attackPosition = e;
+    }
 
     #endregion
 
@@ -170,11 +242,13 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 		{
 			pauseButton.IsVisible = false;
 			pauseMenu.IsVisible = true;
+            StopLoopTimer();
 			return;
 		}
 
 		pauseButton.IsVisible = true;
 		pauseMenu.IsVisible = false;
+        StartLoopTimer();
     }
 
     #endregion
@@ -185,8 +259,8 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
     public float PlayerTranslationY => _player.Location.Y;
 
 
-    public event PropertyChangedEventHandler PropertyChanged;
-    protected void OnPropertyChanged([CallerMemberName] string name = null) =>
+    public new event PropertyChangedEventHandler? PropertyChanged;
+    protected override void OnPropertyChanged([CallerMemberName] string ?name = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
     #endregion

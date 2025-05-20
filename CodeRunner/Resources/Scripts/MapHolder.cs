@@ -1,12 +1,38 @@
 ﻿namespace CodeRunner.Resources.Scripts
 {
-    public class MapHolder
+    public sealed class MapHolder
     {
-        private int[,] _map;
-        private int _entrance;
-        private int _exit;
+        #region Sealing this class
 
-        public readonly Dictionary<int, Color> MapColors = new Dictionary<int, Color>
+        private static readonly MapHolder instance = new MapHolder();
+
+        // Explicit static constructor to tell C# compiler
+        // not to mark type as beforefieldinit
+        static MapHolder()
+        {
+        }
+
+        private MapHolder()
+        {
+            
+        }
+
+        public static MapHolder Instance
+        {
+            get
+            {
+                return instance;
+            }
+        }
+
+        #endregion
+
+
+        private int[,] _map = new int[0,0];
+        private int _entrance = 0;
+        private int _exit = 0;
+
+        public static readonly Dictionary<int, Color> MapColors = new Dictionary<int, Color>
         {
             {0, Colors.Azure },
             {1, Colors.Green },
@@ -19,7 +45,7 @@
         public int Exit { get { return _exit; } }
         public int[,] Map { get { return _map; } }
 
-        public static List<int[,]> Blocks = new List<int[,]>
+        public List<int[,]> Blocks = new List<int[,]>
         {
             new int[,]
             {
@@ -41,11 +67,6 @@
                 { 1, 1 },
             },
         };
-
-        public MapHolder ()
-        {
-            _map = new int[0,0];
-        }
 
         public int[,] GenerateMap(int columns, int rows, int seed = 0)
         {

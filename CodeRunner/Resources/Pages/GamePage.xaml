@@ -9,39 +9,45 @@
         <Grid x:Name="boardGrid" Margin="30">
         </Grid>
 
-        <Grid x:Name="JoystickGrid">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        
+        <Image Source="{Binding PlayerSprite}" x:Name="Player" WidthRequest="60" HeightRequest="60" TranslationX="{Binding PlayerTranslationX}" TranslationY="{Binding PlayerTranslationY}" HorizontalOptions="Start" Margin="30"/>
 
-            <Border BackgroundColor="Transparent" >
-                <controls:Joystick JoystickBackground="Blue" NavigationChanged="MovementDirectionChanged"/>
-            </Border>
+        <Grid x:Name="enemiesGrid"></Grid>
+        <Grid x:Name="projectilesGrid"></Grid>
 
-            <Border Grid.Column="1" Background="Transparent" >
-                <controls:Joystick JoystickBackground="Pink" BigRadius="200" NavigationChanged="AttackDirectionChanged">
-                    <controls:Joystick.GestureRecognizers>
-                        <PanGestureRecognizer PanUpdated="Attack"/>
-                    </controls:Joystick.GestureRecognizers>
-                </controls:Joystick >
-            </Border>
+            <!-- Menu Items-->
+        <Grid>
+            <Grid x:Name="JoystickGrid">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Border BackgroundColor="Transparent" >
+                    <controls:Joystick JoystickBackground="Blue" NavigationChanged="MovementDirectionChanged"/>
+                </Border>
 
-        </Grid>
+                <Border Grid.Column="1" Background="Transparent" >
+                    <controls:Joystick JoystickBackground="Pink" BigRadius="200" NavigationChanged="AttackDirectionChanged">
+                        <controls:Joystick.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="Attack"/>
+                        </controls:Joystick.GestureRecognizers>
+                    </controls:Joystick >
+                </Border>
+            </Grid>
 
-        <Image Source="{Binding PlayerSprite}" x:Name="Player" WidthRequest="60" HeightRequest="60" TranslationX="{Binding PlayerTranslationX}" TranslationY="{Binding PlayerTranslationY}"/>
+            
+            <Button Text="G" Clicked="ClickedGeneration" HorizontalOptions="Start" HeightRequest="50" WidthRequest="50" Background="BlanchedAlmond" />
 
-        <Button Text="G" Clicked="ClickedGeneration" HorizontalOptions="Start" HeightRequest="50" WidthRequest="50" Background="BlanchedAlmond" />
-
-        <Button x:Name="pauseButton" Text="S" WidthRequest="30" HeightRequest="30" HorizontalOptions="End" VerticalOptions="Start" Margin="30"
+            <Button x:Name="pauseButton" Text="S" WidthRequest="30" HeightRequest="30" HorizontalOptions="End" VerticalOptions="Start" Margin="30"
                 Clicked="PauseResume"/>
 
-        <VerticalStackLayout IsVisible="False" x:Name="pauseMenu" Margin="100, 30" Padding="30" Spacing="20">
-            <Button Text="Resume" Clicked="PauseResume" />
-            <Button Text="Settings" Clicked="OpenSettings" />
-            <Button Text="Exit" Clicked="OpenLobby" />
-        </VerticalStackLayout>
+            <VerticalStackLayout IsVisible="False" x:Name="pauseMenu" Margin="100, 30" Padding="30" Spacing="20">
+                <Button Text="Resume" Clicked="PauseResume" />
+                <Button Text="Settings" Clicked="OpenSettings" />
+                <Button Text="Exit" Clicked="OpenLobby" />
+            </VerticalStackLayout>
 
-        
+        </Grid>
+            
     </Grid>
 </ContentPage>

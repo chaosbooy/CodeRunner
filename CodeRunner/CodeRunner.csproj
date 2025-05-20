@@ -78,6 +78,7 @@
 	  <None Remove="Resources\Images\Enemies\SpyEye.gif" />
 	  <None Remove="Resources\Images\Enemies\SpyGhost.gif" />
 	  <None Remove="Resources\Images\Enemies\SpyStar.gif" />
+	  <None Remove="Resources\Images\Player\bullet.png" />
 	  <None Remove="Resources\Images\Player\player.gif" />
 	</ItemGroup>
 
@@ -97,6 +98,7 @@
 	  <MauiImage Include="Resources\Images\Enemies\spyeye.gif" />
 	  <MauiImage Include="Resources\Images\Enemies\spyghost.gif" />
 	  <MauiImage Include="Resources\Images\Enemies\spystar.gif" />
+	  <MauiImage Include="Resources\Images\Player\bullet.png" />
 	  <MauiImage Include="Resources\Images\Player\player.gif" />
 	</ItemGroup>
 

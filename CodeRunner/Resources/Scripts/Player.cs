@@ -11,12 +11,15 @@ namespace CodeRunner.Resources.Scripts
     {
         public string Name { get; set; }
 
-
         public float Speed {get; set; }
         public PointF Location { get; set; }
         public float Rotation { get; set; }
 
         public int Score { get; set; }
+
+        public int NumberOfShots { get; set; }
+
+        public Projectile ProjectileStyle { get; set; }
 
         public string SpritePath { get; set; }
         public string AttackSpritePath { get; set; }
