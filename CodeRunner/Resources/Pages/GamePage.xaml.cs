@@ -36,7 +36,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
             ProjectileStyle = new Projectile
             {
                 Location = new PointF(0, 0),
-                radius = 15,
+                Radius = 15,
                 Rotation = 0,
                 Speed = new PointF(0,0),
                 SpeedMultiplier = 15,
@@ -182,11 +182,13 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
             case GestureStatus.Completed:
             case GestureStatus.Canceled:
 
-                var playerProjectile = _player.ProjectileStyle;
+                var playerProjectile = (Projectile)_player.ProjectileStyle.Clone();
 
                 playerProjectile.Speed = _attackPosition;
                 playerProjectile.Rotation = _player.Rotation;
                 playerProjectile.Location = _player.Location;
+
+                Debug.WriteLine(_attackPosition);
 
                 var projectileImage = new Image
                 {
@@ -195,8 +197,8 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
                     HorizontalOptions = LayoutOptions.Start,
                     TranslationX = playerProjectile.Location.X + (playerProjectile.Speed.X * playerProjectile.SpeedMultiplier),
                     TranslationY = playerProjectile.Location.Y + (playerProjectile.Speed.Y * playerProjectile.SpeedMultiplier),
-                    WidthRequest = playerProjectile.radius,
-                    HeightRequest = playerProjectile.radius,
+                    WidthRequest = playerProjectile.Radius,
+                    HeightRequest = playerProjectile.Radius,
                     Source = playerProjectile.SpritePath
                 };
 

@@ -22,11 +22,11 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Border BackgroundColor="Transparent" >
+                <Border BackgroundColor="Transparent" Stroke="Transparent">
                     <controls:Joystick JoystickBackground="Blue" NavigationChanged="MovementDirectionChanged"/>
                 </Border>
 
-                <Border Grid.Column="1" Background="Transparent" >
+                <Border Grid.Column="1" Background="Transparent" Stroke="Transparent" >
                     <controls:Joystick JoystickBackground="Pink" BigRadius="200" NavigationChanged="AttackDirectionChanged">
                         <controls:Joystick.GestureRecognizers>
                             <PanGestureRecognizer PanUpdated="Attack"/>

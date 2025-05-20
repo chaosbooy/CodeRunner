@@ -49,22 +49,22 @@
         {
             new int[,]
             {
-                { 1 }
+                { 3 }
             },
             new int [,]
             {
-                { 1, 1 },
+                { 3, 3 },
             },
             new int[,]
             {
-               { 1, 1 },
-               { 1, 1 },
+               { 3, 3 },
+               { 3, 3 },
             },
             new int [,]
             {
-                {1, 1 },
-                { 1, 0 },
-                { 1, 1 },
+                {3, 3},
+                { 3, 0 },
+                { 3, 3 },
             },
         };
 
@@ -78,13 +78,23 @@
             entry = rand.Next(rows);
             exit = rand.Next(rows);
 
-            for(int i = 0; i < 5; i++)
+            ////Loop for adding obstacles
+            //for(int i = 0; i < 5; i++)
+            //{
+            //    int[,] randomBlock = Blocks[rand.Next(Blocks.Count)];
+
+            //    int BlockRotation = rand.Next(4);
+
+            //}
+
+            var SelectedBlock = rand.Next(4);
+
+            for (int i = 0; i < Blocks[SelectedBlock].GetLength(0); i++)
             {
-                int[,] randomBlock = Blocks[rand.Next(Blocks.Count)];
-
-                int BlockRotation = rand.Next(4);
-
-
+                for(int j = 0; j < Blocks[SelectedBlock].GetLength(1); j++)
+                {
+                    _map[i + 3, j + 4] = Blocks[SelectedBlock][i,j];
+                }
             }
 
             _map[0,entry] = 1;
