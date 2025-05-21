@@ -17,7 +17,7 @@ namespace CodeRunner.Resources.Scripts
 
         public int Score { get; set; }
 
-        public int NumberOfShots { get; set; }
+        public int NumberOfShotsShot { get; set; }
 
         public Projectile ProjectileStyle { get; set; }
 
@@ -27,7 +27,16 @@ namespace CodeRunner.Resources.Scripts
 
         public Player()
         {
-
+            Name = "Just a virus";
+            Speed = 0;
+            Location = new PointF(0, 0);
+            Rotation = 0;
+            Score = 0;
+            Score = 0;
+            NumberOfShotsShot = 0;
+            ProjectileStyle = new Projectile();
+            SpritePath = "";
+            AttackSpritePath = "";
         }
 
         public void Move(PointF direction)
@@ -49,6 +58,11 @@ namespace CodeRunner.Resources.Scripts
         public object Clone()
         {
             return this.MemberwiseClone();
+        }
+
+        public override string ToString()
+        {
+            return $"Name: {Name} \n Location: {Location} \n Rotation: {Rotation} \n NumberOfShotsShot: {NumberOfShotsShot} \n";
         }
     }
 }

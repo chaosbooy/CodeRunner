@@ -30,15 +30,15 @@
             SemanticProperties.Description="button that starts the game"
             Clicked="OpenGame"
             HorizontalOptions="Fill" />
-            
+
             <Button
             x:Name="Settings"
             Text="Setting me"
             Clicked="OpenSettings"
             SemanticProperties.Description="button to open the settings page" />
-            
+
         </VerticalStackLayout>
     </Grid>
-    
+
 
 </ContentPage>

@@ -53,7 +53,6 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
         BindingContext = this;
 
 
-
         StartLoopTimer();
     }
 
@@ -84,7 +83,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
         _player.Move(_movePosition);
         OnPropertyChanged(nameof(PlayerTranslationX));
         OnPropertyChanged(nameof(PlayerTranslationY));
-
+        
     }
 
     //idk its like a bool for the asynchronous loop to stop
@@ -192,9 +191,10 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 
                 var projectileImage = new Image
                 {
-                    Margin = 50,
+                    Margin = 60 - playerProjectile.Radius,
                     Rotation = playerProjectile.Rotation,
                     HorizontalOptions = LayoutOptions.Start,
+                    VerticalOptions = LayoutOptions.Start,
                     TranslationX = playerProjectile.Location.X + (playerProjectile.Speed.X * playerProjectile.SpeedMultiplier),
                     TranslationY = playerProjectile.Location.Y + (playerProjectile.Speed.Y * playerProjectile.SpeedMultiplier),
                     WidthRequest = playerProjectile.Radius,
@@ -204,6 +204,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 
                 projectilesGrid.Add(projectileImage);
                 _projectiles.Add(playerProjectile);
+                _player.NumberOfShotsShot++;
 
                 break;
         }

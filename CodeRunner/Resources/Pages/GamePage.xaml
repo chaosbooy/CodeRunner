@@ -5,17 +5,25 @@
              x:Class="CodeRunner.GamePage"
              Title="GamePage">
     <Grid>
-        
-        <Grid x:Name="boardGrid" Margin="30">
+
+        <!-- Game Items -->
+        <Grid>
+            <Grid x:Name="boardGrid" />
+
+            <Image Source="{Binding PlayerSprite}" x:Name="Player" WidthRequest="60" HeightRequest="60" TranslationX="{Binding PlayerTranslationX}" TranslationY="{Binding PlayerTranslationY}" HorizontalOptions="Start" VerticalOptions="Start" />
+
+            <Grid x:Name="enemiesGrid" />
+            <Grid x:Name="projectilesGrid" />
         </Grid>
-
         
-        <Image Source="{Binding PlayerSprite}" x:Name="Player" WidthRequest="60" HeightRequest="60" TranslationX="{Binding PlayerTranslationX}" TranslationY="{Binding PlayerTranslationY}" HorizontalOptions="Start" Margin="30"/>
-
-        <Grid x:Name="enemiesGrid"></Grid>
-        <Grid x:Name="projectilesGrid"></Grid>
-
-            <!-- Menu Items-->
+        
+        <!-- Dev info -->
+        <Grid>
+            
+        </Grid>
+        
+        
+            <!-- Menu Items -->
         <Grid>
             <Grid x:Name="JoystickGrid">
                 <Grid.ColumnDefinitions>
