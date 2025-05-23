@@ -18,8 +18,8 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <Label HorizontalOptions="Center" Text="SSMSMS" />
-                <Switch HorizontalOptions="Center" Grid.Column="1" />
+                <Label Text="SSMSMS" HorizontalOptions="End" Margin="50,0"/>
+                <Switch HorizontalOptions="Start" Grid.Column="1" Margin="50,0" />
             </Grid>
 
             <Grid HorizontalOptions="Fill" >
