@@ -14,9 +14,11 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 	private PointF _attackPosition;
     private PointF _movePosition;
 	private Player _player;
+    private Random _rng;
 
     private List<Enemy> _allEnemies;
-    private List<Projectile> _projectiles;
+    private List<Projectile> _allProjectiles;
+    private List<Item> _allItems;
     private bool _baseExists;
 
 
@@ -25,6 +27,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
         _paused = false;
         _level = 0;
         _map = MapHolder.Instance;
+        _rng = new Random(5);
         _player = new Player
         {
             SpritePath = "player.gif",
@@ -46,7 +49,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 
 
         _allEnemies = new List<Enemy>();
-        _projectiles = new List<Projectile>();
+        _allProjectiles = new List<Projectile>();
 
         InitializeComponent();
         BindingContext = this;
@@ -57,7 +60,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 
     private void ClickedGeneration(object sender, EventArgs e)
     {
-        GenerateMap();
+        GenerateLevel();
     }
 
     #region GameLoop
@@ -71,12 +74,12 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 
         }
         
-        for (int i = 0; i < _projectiles.Count; i++)
+        for (int i = 0; i < _allProjectiles.Count; i++)
         {
-            _projectiles[i].Move();
+            _allProjectiles[i].Move();
             var image = (Image)projectilesGrid[i];
-            image.TranslationX = _projectiles[i].Location.X;
-            image.TranslationY = _projectiles[i].Location.Y;
+            image.TranslationX = _allProjectiles[i].Location.X;
+            image.TranslationY = _allProjectiles[i].Location.Y;
         }
 
         _player.Move(_movePosition);
@@ -105,18 +108,19 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
         _cts.Cancel();
     }
 
-    
-
     #endregion
 
     #region Level Generation
 
     private void GenerateLevel()
     {
+        if (_paused) return;
+
+        _level++;
+
         GenerateMap();
         GenerateEnemies();
-
-        GeneratePickUps();
+        GenerateItems();
     }
 
     private void GenerateEnemies()
@@ -127,10 +131,8 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
     }
 
 	private void GenerateMap()
-	{
-		if (_paused) return;
-
-		_map.GenerateMap(20, 10, 5);
+    {
+		_map.GenerateMap(20, 10, _rng.Next());
 
         boardGrid.Children.Clear();
         boardGrid.RowDefinitions.Clear();
@@ -161,9 +163,19 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 		
 	}
 
-    private void GeneratePickUps()
+    private void GenerateItems()
     {
+        _player.Score = 0;
 
+        itemGrid.Children.Clear();
+
+        for(int i = 0; i < _level; i++)
+        {
+            Item tmp;
+            if(_rng.Next(20) == 1)
+                tmp = Item.RareItem();
+            else tmp = Item.NormalItem();
+        }
     }
 
     #endregion
@@ -201,7 +213,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
                 };
 
                 projectilesGrid.Add(projectileImage);
-                _projectiles.Add(playerProjectile);
+                _allProjectiles.Add(playerProjectile);
                 _player.NumberOfShotsShot++;
 
                 break;
