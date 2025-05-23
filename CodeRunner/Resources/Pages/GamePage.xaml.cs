@@ -45,7 +45,6 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
         };
 
 
-
         _allEnemies = new List<Enemy>();
         _projectiles = new List<Projectile>();
 
@@ -131,8 +130,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 	{
 		if (_paused) return;
 
-		Random rand = new Random();
-		_map.GenerateMap(20, 10, rand.Next());
+		_map.GenerateMap(20, 10, 5);
 
         boardGrid.Children.Clear();
         boardGrid.RowDefinitions.Clear();

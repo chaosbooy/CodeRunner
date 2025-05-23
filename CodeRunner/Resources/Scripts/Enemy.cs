@@ -6,6 +6,10 @@
         public string Description { get; set; }
 
         private Point _location;
+        private List<Point> _movePath = new List<Point>();
+        
+        public List<Point> MovePath { get => _movePath; private set => _movePath = value; }
+
         public int Difficulty { get; set; }
 
         public string SpySpritePath{ get; set; }

@@ -14,7 +14,7 @@
 
         private MapHolder()
         {
-            
+
         }
 
         public static MapHolder Instance
@@ -28,7 +28,7 @@
         #endregion
 
 
-        private int[,] _map = new int[0,0];
+        private int[,] _map = new int[0, 0];
         private int _entrance = 0;
         private int _exit = 0;
 
@@ -71,36 +71,105 @@
         public int[,] GenerateMap(int columns, int rows, int seed = 0)
         {
             _map = new int[columns, rows];
-
             Random rand = new Random(seed);
 
-            int entry, exit;
-            entry = rand.Next(rows);
-            exit = rand.Next(rows);
+            int entry = rand.Next(rows);
+            int exit = rand.Next(rows);
+            _map[0, entry] = 1;
+            _map[columns - 1, exit] = 2;
 
-            ////Loop for adding obstacles
-            //for(int i = 0; i < 5; i++)
-            //{
-            //    int[,] randomBlock = Blocks[rand.Next(Blocks.Count)];
+            int blocksToPlace = 5 + rand.Next(8); // At least 5 blocks, up to 12
 
-            //    int BlockRotation = rand.Next(4);
+            int maxAttempts = 100;
 
-            //}
-
-            var SelectedBlock = rand.Next(4);
-
-            for (int i = 0; i < Blocks[SelectedBlock].GetLength(0); i++)
+            for (int b = 0; b < blocksToPlace; b++)
             {
-                for(int j = 0; j < Blocks[SelectedBlock].GetLength(1); j++)
+                int[,] block = Blocks[rand.Next(Blocks.Count)];
+                int rotations = rand.Next(4);
+
+                for (int r = 0; r < rotations; r++)
+                    block = RotateBlock(block);
+
+                bool placed = false;
+                for (int attempt = 0; attempt < maxAttempts && !placed; attempt++)
                 {
-                    _map[i + 3, j + 4] = Blocks[SelectedBlock][i,j];
+                    int maxX = columns - block.GetLength(0);
+                    int maxY = rows - block.GetLength(1);
+
+                    int x = rand.Next(1, maxX - 1); // avoid corners
+                    int y = rand.Next(1, maxY - 1); // avoid corners
+
+                    if (CanPlaceBlock(x, y, block, columns, rows))
+                    {
+                        PlaceBlock(x, y, block);
+                        placed = true;
+                    }
                 }
             }
 
-            _map[0,entry] = 1;
-            _map[columns - 1,exit] = 2;
+            return _map;
+        }
 
-            return Map;
+        private int[,] RotateBlock(int[,] block)
+        {
+            int width = block.GetLength(0);
+            int height = block.GetLength(1);
+            int[,] result = new int[height, width];
+
+            for (int x = 0; x < width; x++)
+                for (int y = 0; y < height; y++)
+                    result[y, width - 1 - x] = block[x, y];
+
+            return result;
+        }
+
+        private bool CanPlaceBlock(int startX, int startY, int[,] block, int mapWidth, int mapHeight)
+        {
+            int blockWidth = block.GetLength(0);
+            int blockHeight = block.GetLength(1);
+
+            for (int x = 0; x < blockWidth; x++)
+            {
+                for (int y = 0; y < blockHeight; y++)
+                {
+                    if (block[x, y] == 0)
+                        continue;
+
+                    int mapX = startX + x;
+                    int mapY = startY + y;
+
+                    if (mapX < 0 || mapY < 0 || mapX >= mapWidth || mapY >= mapHeight)
+                        return false;
+
+                    // Check surrounding cells to avoid touching
+                    for (int dx = -1; dx <= 1; dx++)
+                    {
+                        for (int dy = -1; dy <= 1; dy++)
+                        {
+                            int nx = mapX + dx;
+                            int ny = mapY + dy;
+                            if (nx >= 0 && ny >= 0 && nx < mapWidth && ny < mapHeight && _map[nx, ny] != 0)
+                                return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+        private void PlaceBlock(int startX, int startY, int[,] block)
+        {
+            int width = block.GetLength(0);
+            int height = block.GetLength(1);
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    if (block[x, y] != 0)
+                        _map[startX + x, startY + y] = block[x, y];
+                }
+            }
         }
     }
 }

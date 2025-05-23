@@ -28,8 +28,8 @@ namespace CodeRunner.Resources.Scripts
         public readonly static Enemy Eye = new Enemy
         {
             Name = "eye",
-            Description = "sees everything when base is around and tries to find the player when it's destroyed",
-            Difficulty = 3,
+            Description = "goes between points but when sees the player then it goes for him",
+            Difficulty = 4,
         };
 
         public readonly static Enemy Star = new Enemy
