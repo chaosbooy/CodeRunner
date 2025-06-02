@@ -78,7 +78,10 @@
 	  <None Remove="Resources\Images\Enemies\SpyEye.gif" />
 	  <None Remove="Resources\Images\Enemies\SpyGhost.gif" />
 	  <None Remove="Resources\Images\Enemies\SpyStar.gif" />
-	  <None Remove="Resources\Images\Player\bullet.png" />
+	  <None Remove="Resources\Images\Items\normalitem.gif" />
+	  <None Remove="Resources\Images\Items\rareitem.gif" />
+	  <None Remove="Resources\Images\Player\bullet.gif" />
+	  <None Remove="Resources\Images\Player\health.gif" />
 	  <None Remove="Resources\Images\Player\player.gif" />
 	</ItemGroup>
 
@@ -98,7 +101,10 @@
 	  <MauiImage Include="Resources\Images\Enemies\spyeye.gif" />
 	  <MauiImage Include="Resources\Images\Enemies\spyghost.gif" />
 	  <MauiImage Include="Resources\Images\Enemies\spystar.gif" />
-	  <MauiImage Include="Resources\Images\Player\bullet.png" />
+	  <MauiImage Include="Resources\Images\Items\normalitem.gif" />
+	  <MauiImage Include="Resources\Images\Items\rareitem.gif" />
+	  <MauiImage Include="Resources\Images\Player\bullet.gif" />
+	  <MauiImage Include="Resources\Images\Player\health.gif" />
 	  <MauiImage Include="Resources\Images\Player\player.gif" />
 	</ItemGroup>
 

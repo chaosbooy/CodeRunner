@@ -10,7 +10,7 @@
         <Grid>
             <Grid x:Name="boardGrid" />
 
-            <Image Source="{Binding PlayerSprite}" x:Name="Player" WidthRequest="60" HeightRequest="60" TranslationX="{Binding PlayerTranslationX}" TranslationY="{Binding PlayerTranslationY}" HorizontalOptions="Start" VerticalOptions="Start" />
+            <Image Source="{Binding PlayerSprite}" x:Name="Player" WidthRequest="60" HeightRequest="60" TranslationX="{Binding PlayerTranslationX}" TranslationY="{Binding PlayerTranslationY}" HorizontalOptions="Start" VerticalOptions="Start" AnchorX="0.5" AnchorY="0.5" Aspect="AspectFill" />
 
             <Grid x:Name="enemiesGrid" />
             <Grid x:Name="projectilesGrid" />

@@ -21,6 +21,11 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
     private List<Item> _allItems;
     private bool _baseExists;
 
+    private static double tileWidth;
+    private static double tileHeight;
+
+    private readonly float playerRadius = 30;
+
 
     public GamePage()
     {
@@ -43,7 +48,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
                 Rotation = 0,
                 Speed = new PointF(0,0),
                 SpeedMultiplier = 15,
-                SpritePath = "bullet.png"
+                SpritePath = "bullet.gif"
             }
         };
 
@@ -67,6 +72,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 
     private void GameLoop()
     {
+        if (_map.Map.Length == 0) return;
 
         foreach (var enemy in _allEnemies.Select((value, index) => new { value, index }))
         {
@@ -82,10 +88,43 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
             image.TranslationY = _allProjectiles[i].Location.Y;
         }
 
-        _player.Move(_movePosition);
-        OnPropertyChanged(nameof(PlayerTranslationX));
-        OnPropertyChanged(nameof(PlayerTranslationY));
+        var nextX = _player.Location.X + _movePosition.X * _player.Speed;
+        var nextY = _player.Location.Y + _movePosition.Y * _player.Speed;
         
+        // Separate X and Y movement to allow sliding
+        var currentPos = _player.Location;
+
+        var tryX = new PointF(nextX, currentPos.Y);
+        if (IsWalkable(tryX.X, tryX.Y, playerRadius))
+        {
+            _player.Location = tryX;
+            OnPropertyChanged(nameof(PlayerTranslationX));
+        }
+
+        var tryY = new PointF(_player.Location.X, nextY);
+        if (IsWalkable(tryY.X, tryY.Y, playerRadius))
+        {
+            _player.Location = tryY;
+            OnPropertyChanged(nameof(PlayerTranslationY));
+        }
+        // --- End player movement ---
+
+        for (int i = _allItems.Count - 1; i >= 0; i--)
+        {
+            var item = _allItems[i];
+            var dx = item.Location.X - _player.Location.X;
+            var dy = item.Location.Y - _player.Location.Y;
+            var distance = Math.Sqrt(dx * dx + dy * dy);
+
+            if (distance < item.Radius + 25) // Adjust pickup radius
+            {
+                _player.Score += item.Score;
+                _allItems.RemoveAt(i);
+                itemGrid.Children.RemoveAt(i); // Remove the corresponding image
+                OnPropertyChanged(nameof(PlayerScore));
+            }
+        }
+
     }
 
     //idk its like a bool for the asynchronous loop to stop
@@ -121,6 +160,13 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
         GenerateMap();
         GenerateEnemies();
         GenerateItems();
+
+
+        //Setting player loaction to level start
+        _player.Location = new PointF((float)tileWidth / 2 + playerRadius, (float)((_map.Entrance + 1) * tileHeight - (tileHeight / 2)) + playerRadius);
+        OnPropertyChanged(nameof(PlayerTranslationY));
+        OnPropertyChanged(nameof(PlayerTranslationX));
+        Debug.WriteLine($"SPAWn {_player.Location}");
     }
 
     private void GenerateEnemies()
@@ -160,27 +206,88 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
                 boardGrid.Children.Add(temp);
             }
 		}
-		
-	}
+
+        tileWidth = boardGrid.Width / _map.Map.GetLength(0);
+        tileHeight = boardGrid.Height / _map.Map.GetLength(1);
+
+    }
 
     private void GenerateItems()
     {
+        _allItems = new List<Item>();
+        itemGrid.Children.Clear();
         _player.Score = 0;
 
-        itemGrid.Children.Clear();
+        int itemsToSpawn = Math.Min((_map.Map.Length / 10), _level * 3); // Increase with level but capped
 
-        for(int i = 0; i < _level; i++)
+        var emptyTiles = new List<(int x, int y)>();
+
+        for (int x = 0; x < _map.Map.GetLength(0); x++)
         {
-            Item tmp;
-            if(_rng.Next(20) == 1)
-                tmp = Item.RareItem();
-            else tmp = Item.NormalItem();
+            for (int y = 0; y < _map.Map.GetLength(1); y++)
+            {
+                if (_map.Map[x, y] == 0) // Walkable tile
+                {
+                    emptyTiles.Add((x, y));
+                }
+            }
+        }
+
+        // Shuffle tile positions
+        emptyTiles = emptyTiles.OrderBy(t => _rng.Next()).ToList();
+
+        for (int i = 0; i < Math.Min(itemsToSpawn, emptyTiles.Count); i++)
+        {
+            var (tileX, tileY) = emptyTiles[i];
+            var item = (_rng.Next(20) == 1) ? Item.RareItem() : Item.NormalItem();
+
+            // Center item in tile
+            item.Location = new PointF(
+                (float)(tileX * tileWidth + tileWidth / 2),
+                (float)(tileY * tileHeight + tileHeight / 2)
+            );
+
+            _allItems.Add(item);
+
+            var image = new Image
+            {
+                Source = item.SpritePath,
+                WidthRequest = item.Radius * 2,
+                HeightRequest = item.Radius * 2,
+                TranslationX = item.Location.X,
+                TranslationY = item.Location.Y,
+                HorizontalOptions = LayoutOptions.Start,
+                VerticalOptions = LayoutOptions.Start
+            };
+
+            itemGrid.Children.Add(image);
         }
     }
 
     #endregion
 
     #region Player Controls
+
+    bool IsWalkable(float x, float y, float radius)
+    {
+        if (x - radius < 0 || x + radius >= boardGrid.Width) return false;
+        if (y - radius < 0 || y + radius >= boardGrid.Height) return false;
+
+        int leftTile = (int)((x - radius) / tileWidth);
+        int rightTile = (int)((x + radius) / tileWidth);
+        int topTile = (int)((y - radius) / tileHeight);
+        int bottomTile = (int)((y + radius) / tileHeight);
+
+        for (int i = leftTile; i <= rightTile; i++)
+        {
+            for (int j = topTile; j <= bottomTile; j++)
+            {
+                if (_map.Map[i, j] == 3) return false; // Wall tile
+            }
+        }
+
+        return true;
+    } 
 
     private void MovementDirectionChanged(object sender, PointF e) => _movePosition = e;
 
@@ -268,8 +375,10 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 
     #region Bindings
     public string PlayerSprite => _player.SpritePath;
-    public float PlayerTranslationX => _player.Location.X;
-    public float PlayerTranslationY => _player.Location.Y;
+    public float PlayerTranslationX => (float)(_player.Location.X - (tileWidth / 2));
+    public float PlayerTranslationY => (float)((float)_player.Location.Y - (tileHeight/ 2));
+    public int PlayerScore => _player.Score;
+
 
 
     public new event PropertyChangedEventHandler? PropertyChanged;
