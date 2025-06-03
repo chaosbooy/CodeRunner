@@ -32,6 +32,8 @@
         private int _entrance = 0;
         private int _exit = 0;
 
+        List<(int,int)> _emptyTiles = new List<(int x, int y)>();
+
         public static readonly Dictionary<int, Color> MapColors = new Dictionary<int, Color>
         {
             {0, Colors.Azure },
@@ -44,6 +46,7 @@
         public int Entrance { get { return _entrance; } }
         public int Exit { get { return _exit; } }
         public int[,] Map { get { return _map; } }
+        public List<(int,int)> EmptyTiles { get { return _emptyTiles; } set { _emptyTiles = value; } }
 
         public List<int[,]> Blocks = new List<int[,]>
         {
@@ -73,10 +76,10 @@
             _map = new int[columns, rows];
             Random rand = new Random(seed);
 
-            int entry = rand.Next(rows);
-            int exit = rand.Next(rows);
-            _map[0, entry] = 1;
-            _map[columns - 1, exit] = 2;
+            _entrance = rand.Next(rows);
+            _exit = rand.Next(rows);
+            _map[0, _entrance] = 1;
+            _map[columns - 1, _entrance] = 2;
 
             int blocksToPlace = 5 + rand.Next(8); // At least 5 blocks, up to 12
 
@@ -106,6 +109,8 @@
                     }
                 }
             }
+
+            CountEmpty();
 
             return _map;
         }
@@ -168,6 +173,21 @@
                 {
                     if (block[x, y] != 0)
                         _map[startX + x, startY + y] = block[x, y];
+                }
+            }
+        }
+
+        private void CountEmpty()
+        {
+            _emptyTiles.Clear();
+            for (int x = 0; x < Map.GetLength(0); x++)
+            {
+                for (int y = 0; y < Map.GetLength(1); y++)
+                {
+                    if (Map[x, y] == 0) // Walkable tile
+                    {
+                        _emptyTiles.Add((x, y));
+                    }
                 }
             }
         }

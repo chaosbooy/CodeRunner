@@ -16,10 +16,7 @@ namespace CodeRunner.Resources.Scripts
 
         public void Move()
         {
-            Debug.WriteLine(Location);
             Location = new PointF(Location.X + (Speed.X * SpeedMultiplier), Location.Y + (Speed.Y * SpeedMultiplier));
-            Debug.WriteLine(Location);
-            Debug.WriteLine("");
         }
 
         public object Clone()

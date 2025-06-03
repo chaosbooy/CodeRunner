@@ -21,7 +21,7 @@ namespace CodeRunner.Resources.Scripts
             {
                 Padding = 2,
                 Score = 1,
-                Radius = 5,
+                Radius = 10,
                 SpritePath = "NormalItem.gif",
             };
         }
@@ -32,7 +32,7 @@ namespace CodeRunner.Resources.Scripts
             {
                 Padding = 4,
                 Score = 3,
-                Radius = 8,
+                Radius = 20,
                 SpritePath = "RareItem.gif"
             };
         }

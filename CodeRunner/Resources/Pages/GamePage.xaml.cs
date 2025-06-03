@@ -24,7 +24,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
     private static double tileWidth;
     private static double tileHeight;
 
-    private readonly float playerRadius = 30;
+    private readonly float playerRadius = 20;
 
 
     public GamePage()
@@ -55,6 +55,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 
         _allEnemies = new List<Enemy>();
         _allProjectiles = new List<Projectile>();
+        _allItems = new List<Item>();
 
         InitializeComponent();
         BindingContext = this;
@@ -155,6 +156,11 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
     {
         if (_paused) return;
 
+
+        _player.NumberOfShotsShot = 0;
+        _allProjectiles.Clear();
+        projectilesGrid.Children.Clear();
+
         _level++;
 
         GenerateMap();
@@ -163,16 +169,18 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 
 
         //Setting player loaction to level start
-        _player.Location = new PointF((float)tileWidth / 2 + playerRadius, (float)((_map.Entrance + 1) * tileHeight - (tileHeight / 2)) + playerRadius);
+        _player.Location = new PointF((float)(tileWidth + playerRadius) / 2, (float)((_map.Entrance + 1) * tileHeight - (tileHeight / 2)) + (playerRadius / 2));
         OnPropertyChanged(nameof(PlayerTranslationY));
         OnPropertyChanged(nameof(PlayerTranslationX));
-        Debug.WriteLine($"SPAWn {_player.Location}");
+
     }
 
     private void GenerateEnemies()
-	{
+    {
+        enemiesGrid.Children.Clear();
+        _allEnemies.Clear();
         // y =log(x+1) * 4 <- enemy number spawning
-		// maybe change that with enemy points to give out and then based on difficulty it will spend the points UP to the number of max enemies spawned
+        // maybe change that with enemy points to give out and then based on difficulty it will spend the points UP to the number of max enemies spawned
 
     }
 
@@ -218,23 +226,10 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
         itemGrid.Children.Clear();
         _player.Score = 0;
 
-        int itemsToSpawn = Math.Min((_map.Map.Length / 10), _level * 3); // Increase with level but capped
-
-        var emptyTiles = new List<(int x, int y)>();
-
-        for (int x = 0; x < _map.Map.GetLength(0); x++)
-        {
-            for (int y = 0; y < _map.Map.GetLength(1); y++)
-            {
-                if (_map.Map[x, y] == 0) // Walkable tile
-                {
-                    emptyTiles.Add((x, y));
-                }
-            }
-        }
+        int itemsToSpawn = Math.Min(_map.EmptyTiles.Count, _level * 3); // Increase with level but capped
 
         // Shuffle tile positions
-        emptyTiles = emptyTiles.OrderBy(t => _rng.Next()).ToList();
+        var emptyTiles = _map.EmptyTiles.OrderBy(t => _rng.Next()).ToList();
 
         for (int i = 0; i < Math.Min(itemsToSpawn, emptyTiles.Count); i++)
         {
@@ -243,7 +238,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 
             // Center item in tile
             item.Location = new PointF(
-                (float)(tileX * tileWidth + tileWidth / 2),
+                (float)(tileX * tileWidth + tileWidth / 2 ),
                 (float)(tileY * tileHeight + tileHeight / 2)
             );
 
@@ -254,10 +249,11 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
                 Source = item.SpritePath,
                 WidthRequest = item.Radius * 2,
                 HeightRequest = item.Radius * 2,
-                TranslationX = item.Location.X,
-                TranslationY = item.Location.Y,
+                TranslationX = item.Location.X - item.Radius,
+                TranslationY = item.Location.Y - item.Radius,
                 HorizontalOptions = LayoutOptions.Start,
-                VerticalOptions = LayoutOptions.Start
+                VerticalOptions = LayoutOptions.Start,
+                Background = Colors.Purple
             };
 
             itemGrid.Children.Add(image);
@@ -268,7 +264,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 
     #region Player Controls
 
-    bool IsWalkable(float x, float y, float radius)
+    public bool IsWalkable(float x, float y, float radius)
     {
         if (x - radius < 0 || x + radius >= boardGrid.Width) return false;
         if (y - radius < 0 || y + radius >= boardGrid.Height) return false;
@@ -293,10 +289,12 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 
     private void Attack(object sender, PanUpdatedEventArgs e)
     {
-        switch(e.StatusType)
+        switch (e.StatusType)
         {
             case GestureStatus.Completed:
             case GestureStatus.Canceled:
+
+                if (_player.NumberOfShotsShot > 2) return;
 
                 var playerProjectile = (Projectile)_player.ProjectileStyle.Clone();
 
@@ -304,19 +302,19 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
                 playerProjectile.Rotation = _player.Rotation;
                 playerProjectile.Location = _player.Location;
 
-                Debug.WriteLine(_attackPosition);
-
                 var projectileImage = new Image
                 {
-                    Margin = 60 - playerProjectile.Radius,
                     Rotation = playerProjectile.Rotation,
                     HorizontalOptions = LayoutOptions.Start,
                     VerticalOptions = LayoutOptions.Start,
-                    TranslationX = playerProjectile.Location.X + (playerProjectile.Speed.X * playerProjectile.SpeedMultiplier),
-                    TranslationY = playerProjectile.Location.Y + (playerProjectile.Speed.Y * playerProjectile.SpeedMultiplier),
+                    TranslationX = playerProjectile.Location.X,
+                    TranslationY = playerProjectile.Location.Y,
                     WidthRequest = playerProjectile.Radius,
                     HeightRequest = playerProjectile.Radius,
-                    Source = playerProjectile.SpritePath
+                    Source = playerProjectile.SpritePath,
+                    Aspect = Aspect.Fill,
+                    AnchorX = 0.5,
+                    AnchorY = 0.5,
                 };
 
                 projectilesGrid.Add(projectileImage);
