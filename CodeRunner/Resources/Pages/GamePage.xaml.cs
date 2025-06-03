@@ -32,7 +32,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
         _paused = false;
         _level = 0;
         _map = MapHolder.Instance;
-        _rng = new Random(5);
+        _rng = new Random(4);
         _player = new Player
         {
             SpritePath = "player.gif",
@@ -87,6 +87,14 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
             var image = (Image)projectilesGrid[i];
             image.TranslationX = _allProjectiles[i].Location.X;
             image.TranslationY = _allProjectiles[i].Location.Y;
+
+            var mapTile = ((int)(_allProjectiles[i].Location.X / tileWidth), (int)(_allProjectiles[i].Location.Y / tileWidth));
+            if (mapTile.Item1 >= _map.Map.GetLength(0) || mapTile.Item2 >= _map.Map.GetLength(1) ||
+                mapTile.Item1 < 0 || mapTile.Item2 < 0 ||_map.Map[mapTile.Item1, mapTile.Item2] == 3)
+            {
+                _allProjectiles.RemoveAt(i);
+                projectilesGrid.Children.RemoveAt(i);
+            }
         }
 
         var nextX = _player.Location.X + _movePosition.X * _player.Speed;
@@ -117,12 +125,19 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
             var dy = item.Location.Y - _player.Location.Y;
             var distance = Math.Sqrt(dx * dx + dy * dy);
 
-            if (distance < item.Radius + 25) // Adjust pickup radius
+            if (distance < item.Radius + playerRadius) // Adjust pickup radius
             {
                 _player.Score += item.Score;
                 _allItems.RemoveAt(i);
                 itemGrid.Children.RemoveAt(i); // Remove the corresponding image
                 OnPropertyChanged(nameof(PlayerScore));
+                
+                if (_allItems.Count == 0)
+                {
+                    var temp = (Border)boardGrid.Children[_map.Map.GetLength(1) * (_map.Map.GetLength(0) - 1) + _map.Exit];
+                    temp.BackgroundColor = Colors.Blue;
+                }
+                break;
             }
         }
 
@@ -253,7 +268,6 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
                 TranslationY = item.Location.Y - item.Radius,
                 HorizontalOptions = LayoutOptions.Start,
                 VerticalOptions = LayoutOptions.Start,
-                Background = Colors.Purple
             };
 
             itemGrid.Children.Add(image);
@@ -294,7 +308,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
             case GestureStatus.Completed:
             case GestureStatus.Canceled:
 
-                if (_player.NumberOfShotsShot > 2) return;
+                if (_player.NumberOfShotsShot > 1) return;
 
                 var playerProjectile = (Projectile)_player.ProjectileStyle.Clone();
 
@@ -312,9 +326,6 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
                     WidthRequest = playerProjectile.Radius,
                     HeightRequest = playerProjectile.Radius,
                     Source = playerProjectile.SpritePath,
-                    Aspect = Aspect.Fill,
-                    AnchorX = 0.5,
-                    AnchorY = 0.5,
                 };
 
                 projectilesGrid.Add(projectileImage);

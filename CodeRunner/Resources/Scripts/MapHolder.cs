@@ -79,7 +79,7 @@
             _entrance = rand.Next(rows);
             _exit = rand.Next(rows);
             _map[0, _entrance] = 1;
-            _map[columns - 1, _entrance] = 2;
+            _map[columns - 1, _exit] = 2;
 
             int blocksToPlace = 5 + rand.Next(8); // At least 5 blocks, up to 12
 
