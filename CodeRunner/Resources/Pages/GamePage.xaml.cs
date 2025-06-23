@@ -24,7 +24,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
     private static double tileWidth;
     private static double tileHeight;
 
-    private readonly float playerRadius = 20;
+    private double hitboxRadius = 20;
 
 
     public GamePage()
@@ -51,7 +51,6 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
                 SpritePath = "bullet.gif"
             }
         };
-
 
         _allEnemies = new List<Enemy>();
         _allProjectiles = new List<Projectile>();
@@ -104,14 +103,14 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
         var currentPos = _player.Location;
 
         var tryX = new PointF(nextX, currentPos.Y);
-        if (IsWalkable(tryX.X, tryX.Y, playerRadius))
+        if (IsWalkable(tryX.X, tryX.Y, hitboxRadius))
         {
             _player.Location = tryX;
             OnPropertyChanged(nameof(PlayerTranslationX));
         }
 
         var tryY = new PointF(_player.Location.X, nextY);
-        if (IsWalkable(tryY.X, tryY.Y, playerRadius))
+        if (IsWalkable(tryY.X, tryY.Y, hitboxRadius))
         {
             _player.Location = tryY;
             OnPropertyChanged(nameof(PlayerTranslationY));
@@ -125,7 +124,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
             var dy = item.Location.Y - _player.Location.Y;
             var distance = Math.Sqrt(dx * dx + dy * dy);
 
-            if (distance < item.Radius + playerRadius) // Adjust pickup radius
+            if (distance < item.Radius + hitboxRadius) // Adjust pickup radius
             {
                 _player.Score += item.Score;
                 _allItems.RemoveAt(i);
@@ -179,12 +178,21 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
         _level++;
 
         GenerateMap();
-        GenerateEnemies();
         GenerateItems();
 
+        var tmphitbox = hitboxRadius;
+        hitboxRadius = Math.Min(tileWidth, tileHeight);
+        Debug.WriteLine($"{tileWidth}, {tileHeight}");
+        if (hitboxRadius != tmphitbox)
+        {
+            Player.WidthRequest = tmphitbox;
+            Player.HeightRequest = tmphitbox;
+        }
+        
+        GenerateEnemies();
 
         //Setting player loaction to level start
-        _player.Location = new PointF((float)(tileWidth + playerRadius) / 2, (float)((_map.Entrance + 1) * tileHeight - (tileHeight / 2)) + (playerRadius / 2));
+        _player.Location = new PointF((float)((tileWidth + hitboxRadius) / 2), (float)((_map.Entrance + 1) * tileHeight - (tileHeight / 2)) + ((float)hitboxRadius / 2));
         OnPropertyChanged(nameof(PlayerTranslationY));
         OnPropertyChanged(nameof(PlayerTranslationX));
 
@@ -278,7 +286,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 
     #region Player Controls
 
-    public bool IsWalkable(float x, float y, float radius)
+    public bool IsWalkable(float x, float y, double radius)
     {
         if (x - radius < 0 || x + radius >= boardGrid.Width) return false;
         if (y - radius < 0 || y + radius >= boardGrid.Height) return false;
@@ -384,8 +392,8 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 
     #region Bindings
     public string PlayerSprite => _player.SpritePath;
-    public float PlayerTranslationX => (float)(_player.Location.X - (tileWidth / 2));
-    public float PlayerTranslationY => (float)((float)_player.Location.Y - (tileHeight/ 2));
+    public float PlayerTranslationX => (float)(_player.Location.X - (hitboxRadius / 2));
+    public float PlayerTranslationY => (float)(_player.Location.Y - (hitboxRadius / 2));
     public int PlayerScore => _player.Score;
 
 

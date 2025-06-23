@@ -36,9 +36,9 @@
 
         public static readonly Dictionary<int, Color> MapColors = new Dictionary<int, Color>
         {
-            {0, Colors.Azure },
-            {1, Colors.Green },
-            {2, Colors.Red },
+            {0, Colors.Gray },
+            {1, Colors.DarkGreen },
+            {2, Colors.DarkRed },
             {3, Colors.Black },
         };
 
