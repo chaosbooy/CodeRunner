@@ -1,15 +1,15 @@
 using CodeRunner.Resources.Scripts;
-using Microsoft.Maui.Dispatching;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace CodeRunner;
 
 public partial class GamePage : ContentPage, INotifyPropertyChanged
 {
-	private bool _paused;
-	private int _level;
+    #region variables
+
+    private bool _paused;
+	private int _level = 0;
 	private MapHolder _map;
 	private PointF _attackPosition;
     private PointF _movePosition;
@@ -25,6 +25,9 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
     private static double tileHeight;
 
     private double hitboxRadius = 20;
+    private double padding = 10;
+
+    #endregion
 
 
     public GamePage()
@@ -58,10 +61,33 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 
         InitializeComponent();
         BindingContext = this;
-
-
-        StartLoopTimer();
     }
+
+    private void PageLoaded(object sender, EventArgs e)
+    {
+        // If the level has already been set up, do nothing.
+        if (_level != 0)
+        {
+            return;
+        }
+
+        // Now that the page is loaded, we can safely generate the level
+        // because boardGrid.Width and boardGrid.Height will have their real values.
+        GenerateLevel();
+
+        // NOW it's safe to start the game loop.
+        StartLoopTimer();
+
+        // Set the flag to true so this setup never runs again.
+        _level = 1;
+    }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        StopLoopTimer();
+    }
+
 
     private void ClickedGeneration(object sender, EventArgs e)
     {
@@ -87,7 +113,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
             image.TranslationX = _allProjectiles[i].Location.X;
             image.TranslationY = _allProjectiles[i].Location.Y;
 
-            var mapTile = ((int)(_allProjectiles[i].Location.X / tileWidth), (int)(_allProjectiles[i].Location.Y / tileWidth));
+            var mapTile = ((int)(_allProjectiles[i].Location.X / tileWidth), (int)(_allProjectiles[i].Location.Y / tileHeight));
             if (mapTile.Item1 >= _map.Map.GetLength(0) || mapTile.Item2 >= _map.Map.GetLength(1) ||
                 mapTile.Item1 < 0 || mapTile.Item2 < 0 ||_map.Map[mapTile.Item1, mapTile.Item2] == 3)
             {
@@ -103,17 +129,22 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
         var currentPos = _player.Location;
 
         var tryX = new PointF(nextX, currentPos.Y);
-        if (IsWalkable(tryX.X, tryX.Y, hitboxRadius))
+        if (ContainSurroundings(tryX.X, tryX.Y, hitboxRadius - padding, 3))
         {
             _player.Location = tryX;
             OnPropertyChanged(nameof(PlayerTranslationX));
         }
 
         var tryY = new PointF(_player.Location.X, nextY);
-        if (IsWalkable(tryY.X, tryY.Y, hitboxRadius))
+        if (ContainSurroundings(tryY.X, tryY.Y, hitboxRadius - padding, 3))
         {
             _player.Location = tryY;
             OnPropertyChanged(nameof(PlayerTranslationY));
+        }
+
+        if(ContainSurroundings(_player.Location.X, _player.Location.Y, padding, 4))
+        {
+            GenerateLevel();
         }
         // --- End player movement ---
 
@@ -135,6 +166,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
                 {
                     var temp = (Border)boardGrid.Children[_map.Map.GetLength(1) * (_map.Map.GetLength(0) - 1) + _map.Exit];
                     temp.BackgroundColor = Colors.Blue;
+                    _map.ActivateExit();
                 }
                 break;
             }
@@ -180,19 +212,20 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
         GenerateMap();
         GenerateItems();
 
-        var tmphitbox = hitboxRadius;
-        hitboxRadius = Math.Min(tileWidth, tileHeight);
-        Debug.WriteLine($"{tileWidth}, {tileHeight}");
-        if (hitboxRadius != tmphitbox)
-        {
-            Player.WidthRequest = tmphitbox;
-            Player.HeightRequest = tmphitbox;
-        }
-        
+        hitboxRadius = Math.Min(tileWidth, tileHeight) / 2; // half-size radius
+        padding = hitboxRadius / 3;
+        Player.WidthRequest = hitboxRadius * 2;
+        Player.HeightRequest = hitboxRadius * 2;
+
+
         GenerateEnemies();
 
         //Setting player loaction to level start
-        _player.Location = new PointF((float)((tileWidth + hitboxRadius) / 2), (float)((_map.Entrance + 1) * tileHeight - (tileHeight / 2)) + ((float)hitboxRadius / 2));
+        var startX = tileWidth / 2;
+        var startY = (_map.Entrance * tileHeight) + tileHeight / 2;
+
+        _player.Location = new PointF((float)startX, (float)startY);
+
         OnPropertyChanged(nameof(PlayerTranslationY));
         OnPropertyChanged(nameof(PlayerTranslationX));
 
@@ -235,6 +268,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
                 Grid.SetColumn(temp, i);
 
                 boardGrid.Children.Add(temp);
+
             }
 		}
 
@@ -286,7 +320,8 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 
     #region Player Controls
 
-    public bool IsWalkable(float x, float y, double radius)
+    //Changing from isWalkable to ContainSurroundings and instead of checking the wall it checks if nearby tiles contain the element of the chosen number
+    public bool ContainSurroundings(float x, float y, double radius, int tileID)
     {
         if (x - radius < 0 || x + radius >= boardGrid.Width) return false;
         if (y - radius < 0 || y + radius >= boardGrid.Height) return false;
@@ -300,12 +335,12 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
         {
             for (int j = topTile; j <= bottomTile; j++)
             {
-                if (_map.Map[i, j] == 3) return false; // Wall tile
+                if (_map.Map[i, j] == tileID) return false; // Wall tile
             }
         }
 
         return true;
-    } 
+    }
 
     private void MovementDirectionChanged(object sender, PointF e) => _movePosition = e;
 
@@ -392,9 +427,9 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 
     #region Bindings
     public string PlayerSprite => _player.SpritePath;
-    public float PlayerTranslationX => (float)(_player.Location.X - (hitboxRadius / 2));
-    public float PlayerTranslationY => (float)(_player.Location.Y - (hitboxRadius / 2));
-    public int PlayerScore => _player.Score;
+    public float PlayerTranslationX => (float)(_player.Location.X - hitboxRadius);
+    public float PlayerTranslationY => (float)(_player.Location.Y - hitboxRadius);
+    public string PlayerScore => _player.Score.ToString().PadLeft(4, '0');
 
 
 

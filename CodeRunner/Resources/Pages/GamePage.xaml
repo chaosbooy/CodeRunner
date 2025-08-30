@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:CodeRunner.Resources.Controls"
              x:Class="CodeRunner.GamePage"
-             Title="GamePage">
+             Title="GamePage"
+             Loaded="PageLoaded">
     <Grid>
 
         <!-- Game Items -->
@@ -11,7 +12,7 @@
             <Grid x:Name="boardGrid" />
             <Grid x:Name="itemGrid" />
 
-            <Image Source="{Binding PlayerSprite}" x:Name="Player" WidthRequest="60" HeightRequest="60" TranslationX="{Binding PlayerTranslationX}" TranslationY="{Binding PlayerTranslationY}" HorizontalOptions="Start" VerticalOptions="Start" Background="Blue"/>
+            <Image Source="{Binding PlayerSprite}" x:Name="Player" WidthRequest="60" HeightRequest="60" TranslationX="{Binding PlayerTranslationX}" TranslationY="{Binding PlayerTranslationY}" HorizontalOptions="Start" VerticalOptions="Start"/>
 
             <Grid x:Name="enemiesGrid" />
             <Grid x:Name="projectilesGrid" />
@@ -44,8 +45,8 @@
                 </Border>
             </Grid>
 
-            
-            <Button Text="G" Clicked="ClickedGeneration" HorizontalOptions="Start" HeightRequest="50" WidthRequest="50" Background="BlanchedAlmond" />
+
+            <!-- <Button Text="G" Clicked="ClickedGeneration" HorizontalOptions="Start" HeightRequest="50" WidthRequest="50" Background="BlanchedAlmond" /> -->
 
             <Button x:Name="pauseButton" Text="S" WidthRequest="30" HeightRequest="30" HorizontalOptions="End" VerticalOptions="Start" Margin="30"
                 Clicked="PauseResume"/>
@@ -55,6 +56,8 @@
                 <Button Text="Settings" Clicked="OpenSettings" />
                 <Button Text="Exit" Clicked="OpenLobby" />
             </VerticalStackLayout>
+
+            <Label x:Name="ScoreViewer" VerticalOptions="Start" HorizontalOptions="Start" FontSize="Header" Text="{Binding PlayerScore}" Background="Gray" Opacity="0.5" TextColor="WhiteSmoke" />
 
         </Grid>
             

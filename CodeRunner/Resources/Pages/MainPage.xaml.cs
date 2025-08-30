@@ -9,7 +9,7 @@
 
         private async void OpenGame(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync($"//{nameof(GamePage)}");
+            await Shell.Current.GoToAsync("game");
         }
 
         private async void OpenSettings(object sender, EventArgs e)

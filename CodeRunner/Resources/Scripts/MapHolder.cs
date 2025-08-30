@@ -40,6 +40,7 @@
             {1, Colors.DarkGreen },
             {2, Colors.DarkRed },
             {3, Colors.Black },
+            {4, Colors.DarkBlue },
         };
 
 
@@ -113,6 +114,11 @@
             CountEmpty();
 
             return _map;
+        }
+
+        public void ActivateExit()
+        {
+            _map[_map.GetLength(0) - 1, _exit] = 4;
         }
 
         private int[,] RotateBlock(int[,] block)
