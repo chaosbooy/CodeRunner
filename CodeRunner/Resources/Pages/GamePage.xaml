@@ -4,7 +4,8 @@
              xmlns:controls="clr-namespace:CodeRunner.Resources.Controls"
              x:Class="CodeRunner.GamePage"
              Title="GamePage"
-             Loaded="PageLoaded">
+             Loaded="PageLoaded"
+             SizeChanged="SizeChanged">
     <Grid>
 
         <!-- Game Items -->

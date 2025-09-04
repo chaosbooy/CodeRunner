@@ -15,7 +15,9 @@ namespace CodeRunner.Resources.Scripts
             Name = "dummy",
             Description = "most basic enemy moves randomly",
             Difficulty = 1,
-
+            SpySpritePath = "dummy.gif",
+            BlindSpritePath = "dummy.gif",
+            HitBoxRadius = 1,
         };
 
         public readonly static Enemy Base = new Enemy
@@ -51,6 +53,14 @@ namespace CodeRunner.Resources.Scripts
             Name = "ghost",
             Description = "goes through walls seing the player everywhere, when the base is destroyed doesn't know where to go to",
             Difficulty = 5,
+            SpySpritePath = "spyghost.gif",
+            BlindSpritePath = "blindghost.gif",
+            HitBoxRadius = 0
+        };
+
+        public readonly static List<Enemy> ReadyEnemies = new List<Enemy>
+        {
+             Ghost
         };
     }
 }

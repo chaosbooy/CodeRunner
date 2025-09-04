@@ -5,12 +5,11 @@
         public string Name { get; set; }
         public string Description { get; set; }
 
-        private Point _location;
-        private List<Point> _movePath = new List<Point>();
-        
-        public List<Point> MovePath { get => _movePath; private set => _movePath = value; }
+        public Point Location { get; set; }
+        public float Speed { get; set; } = 2f; // default speed
 
         public int Difficulty { get; set; }
+        public int HitBoxRadius { get; set; }
 
         public string SpySpritePath{ get; set; }
         public event EventHandler SpyMovementScript;
@@ -30,10 +29,10 @@
 
         }
 
-        public void Move(bool isBlind)
+        public void Move(bool isSpy)
         {
-            if(isBlind) BlindMovementScript.Invoke(this, new EventArgs());
-            else SpyMovementScript.Invoke(this, new EventArgs());
+            if(isSpy) SpyMovementScript.Invoke(this, new EventArgs());
+            else BlindMovementScript.Invoke(this, new EventArgs());
         }
 
         public object Clone()

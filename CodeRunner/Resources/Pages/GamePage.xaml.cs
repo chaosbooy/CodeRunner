@@ -1,5 +1,6 @@
 using CodeRunner.Resources.Scripts;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace CodeRunner;
@@ -8,9 +9,15 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 {
     #region variables
 
+    public static GamePage Instance { get; private set; }
+    private static double boardWidth = 0;
+    private static double boardHeight = 0;
+    
+    public Player PlayerRef => _player;
+
     private bool _paused;
 	private int _level = 0;
-	private MapHolder _map;
+	private static MapHolder _map;
 	private PointF _attackPosition;
     private PointF _movePosition;
 	private Player _player;
@@ -19,10 +26,13 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
     private List<Enemy> _allEnemies;
     private List<Projectile> _allProjectiles;
     private List<Item> _allItems;
-    private bool _baseExists;
+    private bool _baseExists = false;
 
-    private static double tileWidth;
-    private static double tileHeight;
+    private static double _tileWidth;
+    private static double _tileHeight;
+
+    public static double TileWidth { get  { return _tileWidth; } }
+    public static double TileHeight { get { return _tileHeight; } }
 
     private double hitboxRadius = 20;
     private double padding = 10;
@@ -32,6 +42,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 
     public GamePage()
     {
+        Instance = this;
         _paused = false;
         _level = 0;
         _map = MapHolder.Instance;
@@ -61,6 +72,19 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 
         InitializeComponent();
         BindingContext = this;
+
+    }
+
+    private void SizeChanged(object sender, EventArgs e)
+    {
+        boardWidth = boardGrid.Width;
+        boardHeight = boardGrid.Height;
+
+        if (_map != null && _map.Map.Length > 0)
+        {
+            _tileWidth = boardWidth / _map.Map.GetLength(0);
+            _tileHeight = boardHeight / _map.Map.GetLength(1);
+        }
     }
 
     private void PageLoaded(object sender, EventArgs e)
@@ -71,15 +95,18 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
             return;
         }
 
+
         // Now that the page is loaded, we can safely generate the level
         // because boardGrid.Width and boardGrid.Height will have their real values.
         GenerateLevel();
 
         // NOW it's safe to start the game loop.
         StartLoopTimer();
+        _player.Score = 0;
 
-        // Set the flag to true so this setup never runs again.
-        _level = 1;
+
+        boardWidth = boardGrid.Width;
+        boardHeight = boardGrid.Height;
     }
 
     protected override void OnDisappearing()
@@ -87,7 +114,6 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
         base.OnDisappearing();
         StopLoopTimer();
     }
-
 
     private void ClickedGeneration(object sender, EventArgs e)
     {
@@ -103,17 +129,19 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
         foreach (var enemy in _allEnemies.Select((value, index) => new { value, index }))
         {
             enemy.value.Move(_baseExists);
-
+            var image = (Image)enemiesGrid.Children[enemy.index];
+            image.TranslationX = enemy.value.Location.X;
+            image.TranslationY = enemy.value.Location.Y;
         }
         
-        for (int i = 0; i < _allProjectiles.Count; i++)
+        for (int i = 0; i < _allProjectiles.Count; i++) 
         {
             _allProjectiles[i].Move();
             var image = (Image)projectilesGrid[i];
             image.TranslationX = _allProjectiles[i].Location.X;
             image.TranslationY = _allProjectiles[i].Location.Y;
 
-            var mapTile = ((int)(_allProjectiles[i].Location.X / tileWidth), (int)(_allProjectiles[i].Location.Y / tileHeight));
+            var mapTile = ((int)(_allProjectiles[i].Location.X / _tileWidth), (int)(_allProjectiles[i].Location.Y / _tileHeight));
             if (mapTile.Item1 >= _map.Map.GetLength(0) || mapTile.Item2 >= _map.Map.GetLength(1) ||
                 mapTile.Item1 < 0 || mapTile.Item2 < 0 ||_map.Map[mapTile.Item1, mapTile.Item2] == 3)
             {
@@ -129,14 +157,14 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
         var currentPos = _player.Location;
 
         var tryX = new PointF(nextX, currentPos.Y);
-        if (ContainSurroundings(tryX.X, tryX.Y, hitboxRadius - padding, 3))
+        if (!ContainSurroundings(tryX.X, tryX.Y, hitboxRadius - padding, 3))
         {
             _player.Location = tryX;
             OnPropertyChanged(nameof(PlayerTranslationX));
         }
 
         var tryY = new PointF(_player.Location.X, nextY);
-        if (ContainSurroundings(tryY.X, tryY.Y, hitboxRadius - padding, 3))
+        if (!ContainSurroundings(tryY.X, tryY.Y, hitboxRadius - padding, 3))
         {
             _player.Location = tryY;
             OnPropertyChanged(nameof(PlayerTranslationY));
@@ -145,6 +173,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
         if(ContainSurroundings(_player.Location.X, _player.Location.Y, padding, 4))
         {
             GenerateLevel();
+            Debug.WriteLine("NEW LEVEL");
         }
         // --- End player movement ---
 
@@ -212,7 +241,7 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
         GenerateMap();
         GenerateItems();
 
-        hitboxRadius = Math.Min(tileWidth, tileHeight) / 2; // half-size radius
+        hitboxRadius = Math.Min(_tileWidth, _tileHeight) / 2; // half-size radius
         padding = hitboxRadius / 3;
         Player.WidthRequest = hitboxRadius * 2;
         Player.HeightRequest = hitboxRadius * 2;
@@ -221,8 +250,8 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
         GenerateEnemies();
 
         //Setting player loaction to level start
-        var startX = tileWidth / 2;
-        var startY = (_map.Entrance * tileHeight) + tileHeight / 2;
+        var startX = _tileWidth / 2;
+        var startY = (_map.Entrance * _tileHeight) + _tileHeight / 2;
 
         _player.Location = new PointF((float)startX, (float)startY);
 
@@ -235,8 +264,42 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
     {
         enemiesGrid.Children.Clear();
         _allEnemies.Clear();
-        // y =log(x+1) * 4 <- enemy number spawning
-        // maybe change that with enemy points to give out and then based on difficulty it will spend the points UP to the number of max enemies spawned
+        int enemyNumber = 0;
+
+        if (_level < 2)
+            _allEnemies.Add(Enemies.Dummy);
+
+        else if (_level < 5)
+            enemyNumber = 2;
+        else if (_level < 10)
+            enemyNumber = 3;
+        else if (_level < 20)
+            enemyNumber = 4;
+        else if (_level < 30)
+            enemyNumber = 5;
+
+            for (int i = 0; i < enemyNumber; i++)
+                _allEnemies.Add((Enemy)Enemies.ReadyEnemies[_rng.Next(Enemies.ReadyEnemies.Count)].Clone());
+
+        for(int i = 0; i < _allEnemies.Count; i++)
+        {
+            var enemyImage = new Image
+            {
+                HorizontalOptions = LayoutOptions.Start,
+                VerticalOptions = LayoutOptions.Start,
+                TranslationX = _allEnemies[i].Location.X,
+                TranslationY = _allEnemies[i].Location.Y,
+                WidthRequest = hitboxRadius,
+                HeightRequest = hitboxRadius,
+                Source = _allEnemies[i].SpySpritePath,
+                Aspect = Aspect.Fill,
+                IsAnimationPlaying = true,
+            };
+
+            _allEnemies[i].HitBoxRadius = _allEnemies[i].HitBoxRadius * (int)hitboxRadius;
+            enemiesGrid.Children.Add(enemyImage);
+        }
+
 
     }
 
@@ -272,8 +335,8 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
             }
 		}
 
-        tileWidth = boardGrid.Width / _map.Map.GetLength(0);
-        tileHeight = boardGrid.Height / _map.Map.GetLength(1);
+        _tileWidth = boardGrid.Width / _map.Map.GetLength(0);
+        _tileHeight = boardGrid.Height / _map.Map.GetLength(1);
 
     }
 
@@ -281,7 +344,6 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
     {
         _allItems = new List<Item>();
         itemGrid.Children.Clear();
-        _player.Score = 0;
 
         int itemsToSpawn = Math.Min(_map.EmptyTiles.Count, _level * 3); // Increase with level but capped
 
@@ -295,8 +357,8 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
 
             // Center item in tile
             item.Location = new PointF(
-                (float)(tileX * tileWidth + tileWidth / 2 ),
-                (float)(tileY * tileHeight + tileHeight / 2)
+                (float)(tileX * _tileWidth + _tileWidth / 2 ),
+                (float)(tileY * _tileWidth + _tileWidth / 2)
             );
 
             _allItems.Add(item);
@@ -321,25 +383,28 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
     #region Player Controls
 
     //Changing from isWalkable to ContainSurroundings and instead of checking the wall it checks if nearby tiles contain the element of the chosen number
-    public bool ContainSurroundings(float x, float y, double radius, int tileID)
+    public static bool ContainSurroundings(float x, float y, double radius, int tileID)
     {
-        if (x - radius < 0 || x + radius >= boardGrid.Width) return false;
-        if (y - radius < 0 || y + radius >= boardGrid.Height) return false;
+        if (boardHeight <= 0 || boardWidth <= 0)
+            return false; // avoid early invalid checks
 
-        int leftTile = (int)((x - radius) / tileWidth);
-        int rightTile = (int)((x + radius) / tileWidth);
-        int topTile = (int)((y - radius) / tileHeight);
-        int bottomTile = (int)((y + radius) / tileHeight);
+        if (x - radius < 0 || x + radius >= boardWidth) return true;
+        if (y - radius < 0 || y + radius >= boardHeight) return true;
+
+        int leftTile = (int)((x - radius) / _tileWidth);
+        int rightTile = (int)((x + radius) / _tileWidth);
+        int topTile = (int)((y - radius) / _tileHeight);
+        int bottomTile = (int)((y + radius) / _tileHeight);
 
         for (int i = leftTile; i <= rightTile; i++)
         {
             for (int j = topTile; j <= bottomTile; j++)
             {
-                if (_map.Map[i, j] == tileID) return false; // Wall tile
+                if (_map.Map[i, j] == tileID) return true; // Found tile
             }
         }
 
-        return true;
+        return false;
     }
 
     private void MovementDirectionChanged(object sender, PointF e) => _movePosition = e;
