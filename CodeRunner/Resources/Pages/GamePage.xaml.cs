@@ -126,15 +126,52 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
     {
         if (_map.Map.Length == 0) return;
 
-        foreach (var enemy in _allEnemies.Select((value, index) => new { value, index }))
+        for (int e = _allEnemies.Count - 1; e >= 0; e--)
         {
-            enemy.value.Move(_baseExists);
-            var image = (Image)enemiesGrid.Children[enemy.index];
-            image.TranslationX = enemy.value.Location.X;
-            image.TranslationY = enemy.value.Location.Y;
+            var enemy = _allEnemies[e];
+
+            // Move enemy
+            enemy.Move(_baseExists);
+
+            if (e >= enemiesGrid.Children.Count) continue; // Safety check
+            var enemyImage = (Image)enemiesGrid.Children[e];
+            enemyImage.TranslationX = enemy.Location.X;
+            enemyImage.TranslationY = enemy.Location.Y;
+
+            // Enemy - Player collision
+            if (IsColliding(Player, 0.4, enemyImage))
+            {
+                EndGame();
+                return;
+            }
+
+            // Enemy - Bullet collision
+            for (int p = _allProjectiles.Count - 1; p >= 0; p--)
+            {
+                if (p >= projectilesGrid.Children.Count) continue;
+                var projectileImage = (Image)projectilesGrid.Children[p];
+
+                if (IsColliding(projectileImage, 1, enemyImage))
+                {
+                    // Remove enemy
+                    enemiesGrid.Children.RemoveAt(e);
+                    _allEnemies.RemoveAt(e);
+
+                    // Remove projectile
+                    projectilesGrid.Children.RemoveAt(p);
+                    _allProjectiles.RemoveAt(p);
+
+                    // Update score
+                    _player.Score += enemy.Difficulty;
+                    OnPropertyChanged(nameof(PlayerScore));
+
+                    break; // Stop checking other projectiles for this enemy
+                }
+            }
         }
-        
-        for (int i = 0; i < _allProjectiles.Count; i++) 
+
+
+        for (int i = _allProjectiles.Count - 1; i >= 0; i++) 
         {
             _allProjectiles[i].Move();
             var image = (Image)projectilesGrid[i];
@@ -224,6 +261,12 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
     }
 
     #endregion
+
+    private async void EndGame()
+    {
+        await Shell.Current.GoToAsync($"//{nameof(MainPage)}");
+        Debug.WriteLine("Kaczka");
+    }
 
     #region Level Generation
 
@@ -405,6 +448,58 @@ public partial class GamePage : ContentPage, INotifyPropertyChanged
         }
 
         return false;
+    }
+
+    private bool IsColliding(View a, double hitboxMultiplier, View b)
+    {
+        if (a == null || b == null)
+            return false;
+
+        // Get absolute positions using Handler and PlatformView
+        var aBounds = new Rect(
+            a.X,
+            a.Y,
+            a.Width,
+            a.Height
+        );
+
+        var bBounds = new Rect(
+            b.X,
+            b.Y,
+            b.Width,
+            b.Height
+        );
+
+        // If inside Grid or StackLayout, Width and Height are correct
+        // but X/Y might be 0, so use TranslationX/Y to adjust:
+        aBounds = new Rect(
+            aBounds.X + a.TranslationX,
+            aBounds.Y + a.TranslationY,
+            aBounds.Width,
+            aBounds.Height
+        );
+
+        bBounds = new Rect(
+            bBounds.X + b.TranslationX,
+            bBounds.Y + b.TranslationY,
+            bBounds.Width,
+            bBounds.Height
+        );
+
+        // Expand hitbox for A
+        double newWidth = aBounds.Width * hitboxMultiplier;
+        double newHeight = aBounds.Height * hitboxMultiplier;
+
+        double adjustedAX = aBounds.X - (newWidth - aBounds.Width) / 2;
+        double adjustedAY = aBounds.Y - (newHeight - aBounds.Height) / 2;
+
+        Debug.WriteLine($"B: {bBounds.Y}, {bBounds.Y} \n A: {adjustedAX}, {adjustedAY}");
+
+        // Check collision
+        return adjustedAX < bBounds.X + bBounds.Width &&
+               adjustedAX + newWidth > bBounds.X &&
+               adjustedAY < bBounds.Y + bBounds.Height &&
+               adjustedAY + newHeight > bBounds.Y;
     }
 
     private void MovementDirectionChanged(object sender, PointF e) => _movePosition = e;
